@@ -1,19 +1,6 @@
 syntax = "proto3";
+option csharp_namespace = "KubeMQ.Grpc"; // Namespace for c# generated classes; if omitted, will be the package.
 package kubemq;
-
-import "gogo.proto";
-
-option (gogoproto.gostring_all) = true;
-option (gogoproto.goproto_stringer_all) = false;
-option (gogoproto.stringer_all) =  true;
-option (gogoproto.marshaler_all) = true;
-option (gogoproto.sizer_all) = true;
-option (gogoproto.unmarshaler_all) = true;
-
-// For tests
-option (gogoproto.testgen_all) = true;
-option (gogoproto.equal_all) = true;
-option (gogoproto.populate_all) = true;
 service kubemq {
     rpc SendEvent (Event) returns (Result) {}
     rpc SendEventsStream (stream Event) returns (stream Result) {}
@@ -107,7 +94,7 @@ message Request {
     int32   CacheTTL            =10;
     bytes   Span                =11;
     map<string,string>  Tags             =12;
-}
+ }
 message Response {
     string  ClientID        =1;
     string  RequestID       =2;
@@ -193,7 +180,7 @@ message AckAllQueueMessagesRequest {
     string RequestID                 =1;
     string  ClientID                 =2;
     string Channel                   =3;
-    int32 WaitTimeSeconds         =4;
+    int32 WaitTimeSeconds                =4;
 }
 message AckAllQueueMessagesResponse {
     string RequestID                =1;
@@ -230,7 +217,6 @@ message StreamQueueMessagesResponse {
     bool IsError                    =4;
     string Error                    =5;
 }
-
 enum PollRequestType {
     PollRequestTypeUnknown      =0;
     Get                         =1;
