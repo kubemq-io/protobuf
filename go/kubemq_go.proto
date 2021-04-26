@@ -254,8 +254,10 @@ enum QueuesDownstreamRequestType {
     NAckRange                   =5;
     ReQueueAll                  =6;
     ReQueueRange                =7;
-    CloseByClient               =8;
-    CloseByServer               =9;
+    ActiveOffsets               =8;
+    TransactionStatus           =9;
+    CloseByClient               =10;
+    CloseByServer               =11;
 }
 
 message QueuesDownstreamRequest {
@@ -277,7 +279,9 @@ message QueuesDownstreamResponse {
     string RefRequestId             =2;
     QueuesDownstreamRequestType RequestTypeData   =3;
     repeated QueueMessage Messages = 4;
-    bool IsError                    =5;
-    string Error                    =6;
-    map<string,string>  Metadata     =7;
+    repeated int64 ActiveOffsets   = 5;
+    bool IsError                    =6;
+    string Error                    =7;
+    bool TransactionComplete        =8;
+    map<string,string>  Metadata     =9;
 }

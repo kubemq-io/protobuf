@@ -1,7 +1,7 @@
 syntax = "proto3";
-option csharp_namespace = "KubeMQ.Grpc"; // Namespace for c# generated classes; if omitted, will be the package.
+option csharp_namespace = "KubeMQ.Client"; // Namespace for c# generated classes;
 package kubemq;
-service kubemq {
+service Kubemq {
     rpc SendEvent (Event) returns (Result) {}
     rpc SendEventsStream (stream Event) returns (stream Result) {}
     rpc SubscribeToEvents (Subscribe) returns (stream EventReceive) {}
