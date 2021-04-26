@@ -68,37 +68,52 @@ func (StreamRequestType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_3c4052a8d0b3cbdc, []int{0}
 }
 
-type PollRequestType int32
+type QueuesDownstreamRequestType int32
 
 const (
-	PollRequestType_PollRequestTypeUnknown PollRequestType = 0
-	PollRequestType_Get                    PollRequestType = 1
-	PollRequestType_AckAll                 PollRequestType = 2
-	PollRequestType_AckRange               PollRequestType = 3
-	PollRequestType_Close                  PollRequestType = 4
+	QueuesDownstreamRequestType_PollRequestTypeUnknown QueuesDownstreamRequestType = 0
+	QueuesDownstreamRequestType_Get                    QueuesDownstreamRequestType = 1
+	QueuesDownstreamRequestType_AckAll                 QueuesDownstreamRequestType = 2
+	QueuesDownstreamRequestType_AckRange               QueuesDownstreamRequestType = 3
+	QueuesDownstreamRequestType_NAckAll                QueuesDownstreamRequestType = 4
+	QueuesDownstreamRequestType_NAckRange              QueuesDownstreamRequestType = 5
+	QueuesDownstreamRequestType_ReQueueAll             QueuesDownstreamRequestType = 6
+	QueuesDownstreamRequestType_ReQueueRange           QueuesDownstreamRequestType = 7
+	QueuesDownstreamRequestType_CloseByClient          QueuesDownstreamRequestType = 8
+	QueuesDownstreamRequestType_CloseByServer          QueuesDownstreamRequestType = 9
 )
 
-var PollRequestType_name = map[int32]string{
+var QueuesDownstreamRequestType_name = map[int32]string{
 	0: "PollRequestTypeUnknown",
 	1: "Get",
 	2: "AckAll",
 	3: "AckRange",
-	4: "Close",
+	4: "NAckAll",
+	5: "NAckRange",
+	6: "ReQueueAll",
+	7: "ReQueueRange",
+	8: "CloseByClient",
+	9: "CloseByServer",
 }
 
-var PollRequestType_value = map[string]int32{
+var QueuesDownstreamRequestType_value = map[string]int32{
 	"PollRequestTypeUnknown": 0,
 	"Get":                    1,
 	"AckAll":                 2,
 	"AckRange":               3,
-	"Close":                  4,
+	"NAckAll":                4,
+	"NAckRange":              5,
+	"ReQueueAll":             6,
+	"ReQueueRange":           7,
+	"CloseByClient":          8,
+	"CloseByServer":          9,
 }
 
-func (x PollRequestType) String() string {
-	return proto.EnumName(PollRequestType_name, int32(x))
+func (x QueuesDownstreamRequestType) String() string {
+	return proto.EnumName(QueuesDownstreamRequestType_name, int32(x))
 }
 
-func (PollRequestType) EnumDescriptor() ([]byte, []int) {
+func (QueuesDownstreamRequestType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_3c4052a8d0b3cbdc, []int{1}
 }
 
@@ -1884,31 +1899,25 @@ func (m *StreamQueueMessagesResponse) GetError() string {
 	return ""
 }
 
-type PollRequest struct {
-	RequestID             string            `protobuf:"bytes,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
-	ClientID              string            `protobuf:"bytes,2,opt,name=ClientID,proto3" json:"ClientID,omitempty"`
-	StreamRequestTypeData PollRequestType   `protobuf:"varint,3,opt,name=StreamRequestTypeData,proto3,enum=kubemq.PollRequestType" json:"StreamRequestTypeData,omitempty"`
-	Channel               string            `protobuf:"bytes,4,opt,name=Channel,proto3" json:"Channel,omitempty"`
-	AutoAck               bool              `protobuf:"varint,5,opt,name=AutoAck,proto3" json:"AutoAck,omitempty"`
-	AckRange              []int64           `protobuf:"varint,6,rep,packed,name=AckRange,proto3" json:"AckRange,omitempty"`
-	RefTransactionId      string            `protobuf:"bytes,7,opt,name=RefTransactionId,proto3" json:"RefTransactionId,omitempty"`
-	Headers               map[string]string `protobuf:"bytes,8,rep,name=Headers,proto3" json:"Headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral  struct{}          `json:"-"`
-	XXX_unrecognized      []byte            `json:"-"`
-	XXX_sizecache         int32             `json:"-"`
+type QueuesUpstreamRequest struct {
+	RequestID            string          `protobuf:"bytes,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
+	Messages             []*QueueMessage `protobuf:"bytes,2,rep,name=Messages,proto3" json:"Messages,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
-func (m *PollRequest) Reset()      { *m = PollRequest{} }
-func (*PollRequest) ProtoMessage() {}
-func (*PollRequest) Descriptor() ([]byte, []int) {
+func (m *QueuesUpstreamRequest) Reset()      { *m = QueuesUpstreamRequest{} }
+func (*QueuesUpstreamRequest) ProtoMessage() {}
+func (*QueuesUpstreamRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3c4052a8d0b3cbdc, []int{20}
 }
-func (m *PollRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueuesUpstreamRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *PollRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueuesUpstreamRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_PollRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueuesUpstreamRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -1918,98 +1927,53 @@ func (m *PollRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (m *PollRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PollRequest.Merge(m, src)
+func (m *QueuesUpstreamRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueuesUpstreamRequest.Merge(m, src)
 }
-func (m *PollRequest) XXX_Size() int {
+func (m *QueuesUpstreamRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *PollRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_PollRequest.DiscardUnknown(m)
+func (m *QueuesUpstreamRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueuesUpstreamRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PollRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueuesUpstreamRequest proto.InternalMessageInfo
 
-func (m *PollRequest) GetRequestID() string {
+func (m *QueuesUpstreamRequest) GetRequestID() string {
 	if m != nil {
 		return m.RequestID
 	}
 	return ""
 }
 
-func (m *PollRequest) GetClientID() string {
+func (m *QueuesUpstreamRequest) GetMessages() []*QueueMessage {
 	if m != nil {
-		return m.ClientID
-	}
-	return ""
-}
-
-func (m *PollRequest) GetStreamRequestTypeData() PollRequestType {
-	if m != nil {
-		return m.StreamRequestTypeData
-	}
-	return PollRequestType_PollRequestTypeUnknown
-}
-
-func (m *PollRequest) GetChannel() string {
-	if m != nil {
-		return m.Channel
-	}
-	return ""
-}
-
-func (m *PollRequest) GetAutoAck() bool {
-	if m != nil {
-		return m.AutoAck
-	}
-	return false
-}
-
-func (m *PollRequest) GetAckRange() []int64 {
-	if m != nil {
-		return m.AckRange
+		return m.Messages
 	}
 	return nil
 }
 
-func (m *PollRequest) GetRefTransactionId() string {
-	if m != nil {
-		return m.RefTransactionId
-	}
-	return ""
+type QueuesUpstreamResponse struct {
+	RefRequestID         string                    `protobuf:"bytes,1,opt,name=RefRequestID,proto3" json:"RefRequestID,omitempty"`
+	Results              []*SendQueueMessageResult `protobuf:"bytes,2,rep,name=Results,proto3" json:"Results,omitempty"`
+	IsError              bool                      `protobuf:"varint,3,opt,name=IsError,proto3" json:"IsError,omitempty"`
+	Error                string                    `protobuf:"bytes,4,opt,name=Error,proto3" json:"Error,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
+	XXX_unrecognized     []byte                    `json:"-"`
+	XXX_sizecache        int32                     `json:"-"`
 }
 
-func (m *PollRequest) GetHeaders() map[string]string {
-	if m != nil {
-		return m.Headers
-	}
-	return nil
-}
-
-type PollResponse struct {
-	TransactionId         string            `protobuf:"bytes,1,opt,name=TransactionId,proto3" json:"TransactionId,omitempty"`
-	RefRequestId          string            `protobuf:"bytes,2,opt,name=RefRequestId,proto3" json:"RefRequestId,omitempty"`
-	StreamRequestTypeData PollRequestType   `protobuf:"varint,3,opt,name=StreamRequestTypeData,proto3,enum=kubemq.PollRequestType" json:"StreamRequestTypeData,omitempty"`
-	Messages              []*QueueMessage   `protobuf:"bytes,4,rep,name=Messages,proto3" json:"Messages,omitempty"`
-	IsError               bool              `protobuf:"varint,5,opt,name=IsError,proto3" json:"IsError,omitempty"`
-	Error                 string            `protobuf:"bytes,6,opt,name=Error,proto3" json:"Error,omitempty"`
-	Headers               map[string]string `protobuf:"bytes,7,rep,name=Headers,proto3" json:"Headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral  struct{}          `json:"-"`
-	XXX_unrecognized      []byte            `json:"-"`
-	XXX_sizecache         int32             `json:"-"`
-}
-
-func (m *PollResponse) Reset()      { *m = PollResponse{} }
-func (*PollResponse) ProtoMessage() {}
-func (*PollResponse) Descriptor() ([]byte, []int) {
+func (m *QueuesUpstreamResponse) Reset()      { *m = QueuesUpstreamResponse{} }
+func (*QueuesUpstreamResponse) ProtoMessage() {}
+func (*QueuesUpstreamResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3c4052a8d0b3cbdc, []int{21}
 }
-func (m *PollResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueuesUpstreamResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *PollResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueuesUpstreamResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_PollResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueuesUpstreamResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -2019,70 +1983,269 @@ func (m *PollResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *PollResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PollResponse.Merge(m, src)
+func (m *QueuesUpstreamResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueuesUpstreamResponse.Merge(m, src)
 }
-func (m *PollResponse) XXX_Size() int {
+func (m *QueuesUpstreamResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *PollResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_PollResponse.DiscardUnknown(m)
+func (m *QueuesUpstreamResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueuesUpstreamResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PollResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueuesUpstreamResponse proto.InternalMessageInfo
 
-func (m *PollResponse) GetTransactionId() string {
+func (m *QueuesUpstreamResponse) GetRefRequestID() string {
 	if m != nil {
-		return m.TransactionId
+		return m.RefRequestID
 	}
 	return ""
 }
 
-func (m *PollResponse) GetRefRequestId() string {
+func (m *QueuesUpstreamResponse) GetResults() []*SendQueueMessageResult {
 	if m != nil {
-		return m.RefRequestId
-	}
-	return ""
-}
-
-func (m *PollResponse) GetStreamRequestTypeData() PollRequestType {
-	if m != nil {
-		return m.StreamRequestTypeData
-	}
-	return PollRequestType_PollRequestTypeUnknown
-}
-
-func (m *PollResponse) GetMessages() []*QueueMessage {
-	if m != nil {
-		return m.Messages
+		return m.Results
 	}
 	return nil
 }
 
-func (m *PollResponse) GetIsError() bool {
+func (m *QueuesUpstreamResponse) GetIsError() bool {
 	if m != nil {
 		return m.IsError
 	}
 	return false
 }
 
-func (m *PollResponse) GetError() string {
+func (m *QueuesUpstreamResponse) GetError() string {
 	if m != nil {
 		return m.Error
 	}
 	return ""
 }
 
-func (m *PollResponse) GetHeaders() map[string]string {
+type QueuesDownstreamRequest struct {
+	RequestID            string                      `protobuf:"bytes,1,opt,name=RequestID,proto3" json:"RequestID,omitempty"`
+	ClientID             string                      `protobuf:"bytes,2,opt,name=ClientID,proto3" json:"ClientID,omitempty"`
+	RequestTypeData      QueuesDownstreamRequestType `protobuf:"varint,3,opt,name=RequestTypeData,proto3,enum=kubemq.QueuesDownstreamRequestType" json:"RequestTypeData,omitempty"`
+	Channel              string                      `protobuf:"bytes,4,opt,name=Channel,proto3" json:"Channel,omitempty"`
+	MaxItems             int32                       `protobuf:"varint,5,opt,name=MaxItems,proto3" json:"MaxItems,omitempty"`
+	WaitTimeout          int32                       `protobuf:"varint,6,opt,name=WaitTimeout,proto3" json:"WaitTimeout,omitempty"`
+	AutoAck              bool                        `protobuf:"varint,7,opt,name=AutoAck,proto3" json:"AutoAck,omitempty"`
+	ReQueueChannel       string                      `protobuf:"bytes,8,opt,name=ReQueueChannel,proto3" json:"ReQueueChannel,omitempty"`
+	SequenceRange        []int64                     `protobuf:"varint,9,rep,packed,name=SequenceRange,proto3" json:"SequenceRange,omitempty"`
+	RefTransactionId     string                      `protobuf:"bytes,10,opt,name=RefTransactionId,proto3" json:"RefTransactionId,omitempty"`
+	Metadata             map[string]string           `protobuf:"bytes,12,rep,name=Metadata,proto3" json:"Metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *QueuesDownstreamRequest) Reset()      { *m = QueuesDownstreamRequest{} }
+func (*QueuesDownstreamRequest) ProtoMessage() {}
+func (*QueuesDownstreamRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3c4052a8d0b3cbdc, []int{22}
+}
+func (m *QueuesDownstreamRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueuesDownstreamRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueuesDownstreamRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueuesDownstreamRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueuesDownstreamRequest.Merge(m, src)
+}
+func (m *QueuesDownstreamRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueuesDownstreamRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueuesDownstreamRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueuesDownstreamRequest proto.InternalMessageInfo
+
+func (m *QueuesDownstreamRequest) GetRequestID() string {
 	if m != nil {
-		return m.Headers
+		return m.RequestID
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamRequest) GetClientID() string {
+	if m != nil {
+		return m.ClientID
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamRequest) GetRequestTypeData() QueuesDownstreamRequestType {
+	if m != nil {
+		return m.RequestTypeData
+	}
+	return QueuesDownstreamRequestType_PollRequestTypeUnknown
+}
+
+func (m *QueuesDownstreamRequest) GetChannel() string {
+	if m != nil {
+		return m.Channel
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamRequest) GetMaxItems() int32 {
+	if m != nil {
+		return m.MaxItems
+	}
+	return 0
+}
+
+func (m *QueuesDownstreamRequest) GetWaitTimeout() int32 {
+	if m != nil {
+		return m.WaitTimeout
+	}
+	return 0
+}
+
+func (m *QueuesDownstreamRequest) GetAutoAck() bool {
+	if m != nil {
+		return m.AutoAck
+	}
+	return false
+}
+
+func (m *QueuesDownstreamRequest) GetReQueueChannel() string {
+	if m != nil {
+		return m.ReQueueChannel
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamRequest) GetSequenceRange() []int64 {
+	if m != nil {
+		return m.SequenceRange
+	}
+	return nil
+}
+
+func (m *QueuesDownstreamRequest) GetRefTransactionId() string {
+	if m != nil {
+		return m.RefTransactionId
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamRequest) GetMetadata() map[string]string {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type QueuesDownstreamResponse struct {
+	TransactionId        string                      `protobuf:"bytes,1,opt,name=TransactionId,proto3" json:"TransactionId,omitempty"`
+	RefRequestId         string                      `protobuf:"bytes,2,opt,name=RefRequestId,proto3" json:"RefRequestId,omitempty"`
+	RequestTypeData      QueuesDownstreamRequestType `protobuf:"varint,3,opt,name=RequestTypeData,proto3,enum=kubemq.QueuesDownstreamRequestType" json:"RequestTypeData,omitempty"`
+	Messages             []*QueueMessage             `protobuf:"bytes,4,rep,name=Messages,proto3" json:"Messages,omitempty"`
+	IsError              bool                        `protobuf:"varint,5,opt,name=IsError,proto3" json:"IsError,omitempty"`
+	Error                string                      `protobuf:"bytes,6,opt,name=Error,proto3" json:"Error,omitempty"`
+	Metadata             map[string]string           `protobuf:"bytes,7,rep,name=Metadata,proto3" json:"Metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *QueuesDownstreamResponse) Reset()      { *m = QueuesDownstreamResponse{} }
+func (*QueuesDownstreamResponse) ProtoMessage() {}
+func (*QueuesDownstreamResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3c4052a8d0b3cbdc, []int{23}
+}
+func (m *QueuesDownstreamResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueuesDownstreamResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueuesDownstreamResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueuesDownstreamResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueuesDownstreamResponse.Merge(m, src)
+}
+func (m *QueuesDownstreamResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueuesDownstreamResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueuesDownstreamResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueuesDownstreamResponse proto.InternalMessageInfo
+
+func (m *QueuesDownstreamResponse) GetTransactionId() string {
+	if m != nil {
+		return m.TransactionId
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamResponse) GetRefRequestId() string {
+	if m != nil {
+		return m.RefRequestId
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamResponse) GetRequestTypeData() QueuesDownstreamRequestType {
+	if m != nil {
+		return m.RequestTypeData
+	}
+	return QueuesDownstreamRequestType_PollRequestTypeUnknown
+}
+
+func (m *QueuesDownstreamResponse) GetMessages() []*QueueMessage {
+	if m != nil {
+		return m.Messages
+	}
+	return nil
+}
+
+func (m *QueuesDownstreamResponse) GetIsError() bool {
+	if m != nil {
+		return m.IsError
+	}
+	return false
+}
+
+func (m *QueuesDownstreamResponse) GetError() string {
+	if m != nil {
+		return m.Error
+	}
+	return ""
+}
+
+func (m *QueuesDownstreamResponse) GetMetadata() map[string]string {
+	if m != nil {
+		return m.Metadata
 	}
 	return nil
 }
 
 func init() {
 	proto.RegisterEnum("kubemq.StreamRequestType", StreamRequestType_name, StreamRequestType_value)
-	proto.RegisterEnum("kubemq.PollRequestType", PollRequestType_name, PollRequestType_value)
+	proto.RegisterEnum("kubemq.QueuesDownstreamRequestType", QueuesDownstreamRequestType_name, QueuesDownstreamRequestType_value)
 	proto.RegisterEnum("kubemq.Subscribe_SubscribeType", Subscribe_SubscribeType_name, Subscribe_SubscribeType_value)
 	proto.RegisterEnum("kubemq.Subscribe_EventsStoreType", Subscribe_EventsStoreType_name, Subscribe_EventsStoreType_value)
 	proto.RegisterEnum("kubemq.Request_RequestType", Request_RequestType_name, Request_RequestType_value)
@@ -2111,144 +2274,155 @@ func init() {
 	proto.RegisterType((*AckAllQueueMessagesResponse)(nil), "kubemq.AckAllQueueMessagesResponse")
 	proto.RegisterType((*StreamQueueMessagesRequest)(nil), "kubemq.StreamQueueMessagesRequest")
 	proto.RegisterType((*StreamQueueMessagesResponse)(nil), "kubemq.StreamQueueMessagesResponse")
-	proto.RegisterType((*PollRequest)(nil), "kubemq.PollRequest")
-	proto.RegisterMapType((map[string]string)(nil), "kubemq.PollRequest.HeadersEntry")
-	proto.RegisterType((*PollResponse)(nil), "kubemq.PollResponse")
-	proto.RegisterMapType((map[string]string)(nil), "kubemq.PollResponse.HeadersEntry")
+	proto.RegisterType((*QueuesUpstreamRequest)(nil), "kubemq.QueuesUpstreamRequest")
+	proto.RegisterType((*QueuesUpstreamResponse)(nil), "kubemq.QueuesUpstreamResponse")
+	proto.RegisterType((*QueuesDownstreamRequest)(nil), "kubemq.QueuesDownstreamRequest")
+	proto.RegisterMapType((map[string]string)(nil), "kubemq.QueuesDownstreamRequest.MetadataEntry")
+	proto.RegisterType((*QueuesDownstreamResponse)(nil), "kubemq.QueuesDownstreamResponse")
+	proto.RegisterMapType((map[string]string)(nil), "kubemq.QueuesDownstreamResponse.MetadataEntry")
 }
 
 func init() { proto.RegisterFile("kubemq_go.proto", fileDescriptor_3c4052a8d0b3cbdc) }
 
 var fileDescriptor_3c4052a8d0b3cbdc = []byte{
-	// 2044 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x59, 0xbd, 0x73, 0x23, 0x49,
-	0x15, 0xd7, 0x7c, 0x48, 0xb2, 0x9e, 0xb5, 0xd6, 0xb8, 0x6d, 0x7c, 0x73, 0xb3, 0x5b, 0xc2, 0x37,
-	0x77, 0x81, 0x6b, 0x6f, 0x51, 0x19, 0x53, 0xd4, 0x5d, 0x2d, 0x75, 0x57, 0x68, 0x6d, 0xdf, 0xed,
-	0xc2, 0xfa, 0xd6, 0xd7, 0xf2, 0x2e, 0x01, 0x01, 0x8c, 0xa5, 0x96, 0x77, 0xb0, 0x34, 0xa3, 0x9b,
-	0x69, 0xf9, 0x56, 0x19, 0x1f, 0x45, 0x42, 0x11, 0x10, 0xc1, 0x41, 0x44, 0x40, 0x40, 0xf1, 0x17,
-	0x50, 0x90, 0x10, 0x12, 0x12, 0x12, 0xb2, 0xa6, 0xc8, 0x08, 0xa8, 0x22, 0xa1, 0x8a, 0x84, 0xea,
-	0x8f, 0x99, 0xe9, 0x19, 0x8d, 0xb4, 0xbb, 0xc6, 0x75, 0xd9, 0xbc, 0xd7, 0xaf, 0xbb, 0xdf, 0xfb,
-	0xbd, 0x8f, 0x7e, 0xdd, 0x03, 0xad, 0xf3, 0xe9, 0x29, 0x19, 0x7f, 0xf2, 0x9d, 0xb3, 0xb0, 0x33,
-	0x89, 0x42, 0x1a, 0xa2, 0x9a, 0x60, 0x38, 0x70, 0x16, 0x26, 0x3c, 0xf7, 0xe7, 0x1a, 0xc0, 0xb1,
-	0x1f, 0x9c, 0x61, 0x12, 0x4f, 0x47, 0x14, 0x21, 0x30, 0xef, 0x87, 0x31, 0xb5, 0xb5, 0x6d, 0x6d,
-	0xa7, 0x81, 0xf9, 0x37, 0xb2, 0xa1, 0xfe, 0x84, 0x44, 0xb1, 0x1f, 0x06, 0xb6, 0xce, 0xd9, 0x09,
-	0x89, 0x76, 0xa0, 0xd5, 0x23, 0xd1, 0x05, 0x89, 0x7a, 0xd4, 0x8b, 0xe8, 0x89, 0x3f, 0x26, 0xb6,
-	0xb1, 0xad, 0xed, 0x18, 0xb8, 0xc8, 0x46, 0xbb, 0xb0, 0x21, 0x58, 0x8f, 0x27, 0x8c, 0xee, 0x91,
-	0x7e, 0x18, 0x0c, 0x62, 0xdb, 0xe4, 0xd2, 0x65, 0x43, 0x6e, 0x1d, 0xaa, 0x87, 0xe3, 0x09, 0x9d,
-	0xb9, 0x0f, 0xa1, 0x26, 0x95, 0xb3, 0xa1, 0x7e, 0x78, 0x41, 0x02, 0xfa, 0xe0, 0x40, 0xea, 0x97,
-	0x90, 0x4c, 0xed, 0x1e, 0x09, 0x28, 0xd7, 0x6f, 0x05, 0xf3, 0x6f, 0xb4, 0x09, 0xd5, 0xc3, 0x28,
-	0x0a, 0x23, 0xae, 0x52, 0x03, 0x0b, 0xc2, 0xfd, 0x91, 0x0e, 0x55, 0x3e, 0x6b, 0xc9, 0x6a, 0x0e,
-	0xac, 0xec, 0x8f, 0x7c, 0x31, 0x24, 0x2c, 0x4e, 0x69, 0x36, 0x6b, 0xff, 0xa9, 0x17, 0x04, 0x64,
-	0x24, 0xd7, 0x4d, 0x48, 0x36, 0xeb, 0x88, 0x50, 0x6f, 0xe0, 0x51, 0x8f, 0xdb, 0xd5, 0xc0, 0x29,
-	0xcd, 0xf4, 0xbb, 0x17, 0x0e, 0x66, 0x76, 0x75, 0x5b, 0xdb, 0x69, 0x62, 0xfe, 0xcd, 0xf4, 0xeb,
-	0xd1, 0x30, 0x22, 0x76, 0x8d, 0x2b, 0x2d, 0x08, 0xf4, 0x36, 0x98, 0x27, 0xde, 0x59, 0x6c, 0xd7,
-	0xb7, 0x8d, 0x9d, 0xd5, 0xbd, 0xd7, 0x3a, 0xc2, 0x65, 0x1d, 0xae, 0x5a, 0x87, 0x8d, 0x1c, 0x06,
-	0x34, 0x9a, 0x61, 0x2e, 0xe4, 0xbc, 0x03, 0x8d, 0x94, 0x85, 0x2c, 0x30, 0xce, 0xc9, 0x4c, 0xda,
-	0xc2, 0x3e, 0xd9, 0x0e, 0x17, 0xde, 0x68, 0x4a, 0xa4, 0x11, 0x82, 0xb8, 0xab, 0xbf, 0xab, 0xb9,
-	0xbf, 0xd4, 0xa1, 0xc9, 0x97, 0xc4, 0xa4, 0x4f, 0xfc, 0x0b, 0xb2, 0x04, 0x0c, 0xc5, 0x60, 0x7d,
-	0xb1, 0xc1, 0xc6, 0x02, 0x83, 0x4d, 0xc5, 0xe0, 0x5b, 0xd0, 0x60, 0x0e, 0x8e, 0xa9, 0x37, 0x9e,
-	0x70, 0x24, 0x0c, 0x9c, 0x31, 0xd8, 0x6a, 0x3d, 0xf2, 0xc9, 0x94, 0x04, 0x7d, 0x81, 0x88, 0x89,
-	0x53, 0x1a, 0xed, 0xe5, 0x40, 0x69, 0xe7, 0x40, 0x91, 0x16, 0x5c, 0x1f, 0x36, 0x7f, 0x34, 0xa1,
-	0xd1, 0x9b, 0x9e, 0xc6, 0xfd, 0xc8, 0x3f, 0x25, 0xe8, 0x08, 0xd6, 0x53, 0xe2, 0x64, 0x36, 0x21,
-	0x07, 0xcc, 0x5a, 0xb6, 0xce, 0xda, 0xde, 0x17, 0x13, 0x3d, 0x52, 0x81, 0x4e, 0x4e, 0x14, 0xcf,
-	0xcf, 0xbc, 0x62, 0x68, 0x6d, 0x42, 0xf5, 0xc3, 0x28, 0x9c, 0x4e, 0x64, 0x5c, 0x09, 0x02, 0xf5,
-	0x60, 0x83, 0x23, 0x10, 0xf3, 0xc8, 0x49, 0x95, 0xab, 0x72, 0xe5, 0xde, 0x98, 0x57, 0xae, 0x20,
-	0x8c, 0xcb, 0x66, 0xa3, 0x3d, 0xd8, 0x2c, 0xb0, 0x9f, 0x70, 0x98, 0x6a, 0xdc, 0x5f, 0xa5, 0x63,
-	0x6e, 0x1f, 0x6e, 0xe4, 0x2c, 0x45, 0x0e, 0x6c, 0xe5, 0x18, 0x8f, 0x83, 0x01, 0x19, 0xfa, 0x01,
-	0x19, 0x58, 0x15, 0x04, 0x50, 0x13, 0x8b, 0x58, 0x1a, 0x6a, 0xc1, 0xaa, 0xb2, 0xa0, 0xa5, 0xa3,
-	0x26, 0xac, 0xec, 0x87, 0xe3, 0xb1, 0x17, 0x0c, 0x62, 0xcb, 0x40, 0xab, 0x50, 0xff, 0x78, 0x4a,
-	0x22, 0x9f, 0xc4, 0x96, 0xe9, 0xfe, 0x46, 0x83, 0x56, 0x61, 0x77, 0x74, 0x0b, 0xec, 0x02, 0x4b,
-	0xdd, 0xc9, 0x82, 0x26, 0x2f, 0x40, 0x1f, 0x91, 0x4f, 0x1f, 0x05, 0xa3, 0x99, 0xa5, 0x21, 0x04,
-	0x6b, 0x9c, 0xf3, 0x41, 0x14, 0x8e, 0x3f, 0xf0, 0xa3, 0x98, 0x5a, 0x3a, 0x5a, 0x87, 0x1b, 0x29,
-	0xef, 0xa1, 0x17, 0x53, 0xcb, 0x40, 0x1b, 0xd0, 0xe2, 0xac, 0x2e, 0x4d, 0x22, 0xd0, 0x32, 0x99,
-	0xae, 0x92, 0xc9, 0x62, 0xd6, 0xaa, 0xa2, 0x4d, 0xb0, 0x14, 0xc6, 0x01, 0x19, 0x51, 0xcf, 0xaa,
-	0xb9, 0x3f, 0x36, 0xa1, 0x8e, 0xd9, 0xac, 0x98, 0xb2, 0x80, 0x97, 0x9f, 0x69, 0x5a, 0x65, 0x0c,
-	0x74, 0x08, 0x2d, 0x49, 0xa4, 0xae, 0xd3, 0xb9, 0xeb, 0x6e, 0x26, 0xae, 0x93, 0xc3, 0x1d, 0x45,
-	0x0c, 0x17, 0xe7, 0xe4, 0x22, 0xca, 0x58, 0x1c, 0x51, 0xe6, 0xe2, 0xdc, 0xad, 0x2e, 0xc8, 0xdd,
-	0x9a, 0x92, 0xbb, 0x2e, 0x34, 0x31, 0x99, 0x8c, 0x66, 0xc9, 0x72, 0x75, 0x3e, 0x27, 0xc7, 0x63,
-	0xbb, 0x31, 0x24, 0xc2, 0x29, 0xb5, 0x57, 0xb6, 0xb5, 0x9d, 0x2a, 0x4e, 0x48, 0xae, 0xa3, 0xd7,
-	0x7f, 0x4a, 0xbe, 0x49, 0x66, 0x76, 0x43, 0xea, 0x28, 0xe9, 0x74, 0xec, 0xe4, 0xe4, 0xa1, 0x0d,
-	0x7c, 0x5a, 0x4a, 0xf3, 0xb2, 0x3e, 0xf1, 0x02, 0x7b, 0x55, 0x68, 0xc2, 0xbe, 0xd1, 0x97, 0x64,
-	0x2d, 0x68, 0xf2, 0x5a, 0xf0, 0x7a, 0x11, 0xab, 0x6b, 0x2b, 0x03, 0xef, 0xc1, 0xaa, 0x02, 0x35,
-	0xda, 0x02, 0xa4, 0x90, 0x8f, 0x83, 0xf3, 0x20, 0xfc, 0x34, 0xb0, 0x2a, 0x2c, 0x46, 0x65, 0xc4,
-	0x5a, 0x1a, 0x6a, 0x40, 0x95, 0x05, 0xec, 0xcc, 0xd2, 0xdd, 0x1f, 0x18, 0xb0, 0x82, 0x49, 0x3c,
-	0x09, 0x83, 0x98, 0xe4, 0x7c, 0xa4, 0x15, 0x7c, 0x94, 0x0b, 0x12, 0xbd, 0x18, 0x24, 0x45, 0xdc,
-	0x8d, 0x12, 0xdc, 0x5f, 0xf5, 0xe0, 0x49, 0x10, 0xbf, 0xef, 0x53, 0x79, 0xf6, 0xa4, 0x74, 0xbe,
-	0x46, 0xd7, 0x4b, 0x6a, 0xf4, 0xe1, 0x33, 0xd2, 0x9f, 0x52, 0x32, 0xe0, 0x2e, 0x5e, 0xc1, 0x29,
-	0x9d, 0x1d, 0xb7, 0x0d, 0xe5, 0xb8, 0x4d, 0x3d, 0x08, 0x8a, 0x07, 0x3b, 0xd2, 0x83, 0xab, 0xdc,
-	0x83, 0x4e, 0xe6, 0x41, 0x81, 0xd6, 0xf5, 0xb9, 0xf0, 0xdf, 0x3a, 0x34, 0x3f, 0x9e, 0x92, 0x29,
-	0x39, 0x22, 0x71, 0xec, 0x9d, 0xb1, 0x7a, 0xd1, 0x90, 0x9f, 0x59, 0x42, 0xa6, 0x8c, 0xcf, 0xe9,
-	0xd8, 0x4f, 0xce, 0xb2, 0x5a, 0xfe, 0x2c, 0x53, 0xf5, 0x2c, 0x22, 0x80, 0xde, 0x07, 0xe8, 0x52,
-	0x1a, 0xf9, 0xa7, 0x53, 0x4a, 0x62, 0xee, 0x96, 0x05, 0x33, 0x33, 0x29, 0xac, 0xcc, 0x40, 0x7b,
-	0x50, 0x3b, 0x0e, 0x47, 0x7e, 0x7f, 0xc6, 0xbd, 0xa6, 0x60, 0xae, 0xce, 0x15, 0x12, 0x58, 0x4a,
-	0x5e, 0x1d, 0xf5, 0x33, 0x78, 0x5d, 0x5d, 0x36, 0xbe, 0xe7, 0xd1, 0xfe, 0xd3, 0xa4, 0x24, 0xda,
-	0x50, 0xe7, 0x74, 0xd6, 0x67, 0x48, 0x12, 0xed, 0x32, 0x1c, 0xc5, 0x0c, 0x5b, 0xe7, 0xd8, 0x6c,
-	0x96, 0x69, 0x89, 0x53, 0x29, 0xf7, 0x67, 0x1a, 0x38, 0x65, 0x3b, 0xc9, 0xa4, 0x5b, 0xbc, 0xd5,
-	0xbb, 0xac, 0x44, 0xb3, 0x8e, 0x32, 0xd9, 0x29, 0xc5, 0xb2, 0x47, 0x82, 0x41, 0x6e, 0x37, 0x2e,
-	0x86, 0x13, 0x71, 0xd4, 0x06, 0xb8, 0xef, 0x5d, 0x10, 0x1e, 0xdb, 0x31, 0x8f, 0x84, 0x15, 0xac,
-	0x70, 0xdc, 0x5f, 0xeb, 0xb0, 0x55, 0xee, 0x8f, 0x7c, 0x66, 0x69, 0xcb, 0xba, 0x1f, 0xbd, 0xd0,
-	0xfd, 0xb0, 0xa8, 0x3d, 0xf8, 0xea, 0xa3, 0x21, 0x0f, 0x25, 0x43, 0x46, 0x6d, 0xc2, 0x10, 0x15,
-	0x82, 0xb7, 0x40, 0xfb, 0xe1, 0x34, 0xa0, 0x3c, 0x06, 0xab, 0x38, 0xc7, 0x63, 0xab, 0x63, 0x82,
-	0x43, 0x9e, 0xb7, 0x55, 0x91, 0xb7, 0x09, 0x8d, 0xee, 0xc0, 0x7a, 0xf2, 0xcd, 0x8e, 0x40, 0xae,
-	0x3d, 0x2f, 0x0b, 0x0d, 0x3c, 0x3f, 0xc0, 0x76, 0x3b, 0x7c, 0x36, 0xf1, 0x23, 0x8f, 0xfa, 0x61,
-	0xd0, 0xa5, 0xb2, 0x44, 0xe4, 0x78, 0x4c, 0xdf, 0x03, 0x32, 0xf2, 0x66, 0x64, 0x70, 0x12, 0xf2,
-	0x80, 0x33, 0x70, 0xc6, 0x70, 0xff, 0xa0, 0x01, 0x9a, 0x0f, 0x3b, 0xa6, 0x46, 0xb6, 0x48, 0x72,
-	0x3d, 0xd0, 0xb8, 0x2d, 0xf3, 0x03, 0x4c, 0x0d, 0xbe, 0x62, 0x22, 0xa8, 0x0b, 0xa3, 0x55, 0x1e,
-	0xbb, 0x9c, 0x1c, 0x79, 0xcf, 0x72, 0xd8, 0x18, 0x5c, 0xac, 0xc8, 0xce, 0x4b, 0x0a, 0x00, 0x44,
-	0x26, 0x17, 0xd9, 0xee, 0x9f, 0x34, 0xd8, 0x2a, 0x8f, 0x91, 0x17, 0xd4, 0x96, 0x2d, 0xa8, 0xb1,
-	0x4b, 0x49, 0x57, 0x5c, 0x51, 0x0c, 0x2c, 0xa9, 0x39, 0x3c, 0x8d, 0x17, 0xe1, 0x69, 0x16, 0xf0,
-	0x64, 0x61, 0xfe, 0x20, 0x16, 0x95, 0x57, 0xb8, 0x36, 0x21, 0xb3, 0x8a, 0x5c, 0x53, 0x2f, 0x40,
-	0xff, 0xd0, 0xe0, 0xa6, 0x6a, 0x53, 0x92, 0x3c, 0x2f, 0xd7, 0xb4, 0x5c, 0xad, 0x46, 0xee, 0xc2,
-	0xc6, 0x91, 0xf7, 0xec, 0xa3, 0xe9, 0xf8, 0x94, 0x44, 0x8f, 0x86, 0x69, 0x9a, 0x8b, 0x50, 0x2d,
-	0x1b, 0x62, 0x2e, 0xf9, 0x96, 0xe7, 0x53, 0xf5, 0xae, 0x58, 0x15, 0xce, 0x2b, 0xb0, 0x19, 0xb2,
-	0x0f, 0xe2, 0x63, 0xe2, 0x9d, 0xcb, 0xb3, 0x4c, 0x52, 0xee, 0x4f, 0x75, 0xb8, 0x55, 0x6e, 0xa7,
-	0xac, 0x0f, 0xcb, 0x0d, 0x7d, 0xe5, 0x72, 0x84, 0x6e, 0x83, 0x95, 0xed, 0xc1, 0xf7, 0x1d, 0xc8,
-	0x80, 0x9b, 0xe3, 0xf3, 0x88, 0x93, 0x3c, 0xee, 0x6a, 0x32, 0x90, 0x60, 0x14, 0xd9, 0x8a, 0x79,
-	0x55, 0xd5, 0x3c, 0xd5, 0xed, 0xb5, 0x05, 0x6e, 0xaf, 0xab, 0x6e, 0xff, 0x95, 0x06, 0x4e, 0xb7,
-	0x7f, 0xde, 0x1d, 0x8d, 0x3e, 0x37, 0xaf, 0x97, 0xf8, 0xd0, 0x2c, 0xf5, 0xa1, 0xfb, 0x0b, 0x0d,
-	0x6e, 0x96, 0x2a, 0xf7, 0x52, 0xae, 0xba, 0x0d, 0x56, 0x77, 0x38, 0x24, 0x7d, 0x4a, 0x06, 0x8a,
-	0xcb, 0x58, 0x0d, 0x9d, 0xe3, 0xab, 0xb0, 0x19, 0x0b, 0x60, 0x33, 0x55, 0xd8, 0xfe, 0xab, 0x83,
-	0xd3, 0xa3, 0x11, 0xf1, 0xc6, 0xd7, 0x0c, 0xdb, 0x23, 0xf8, 0x82, 0x58, 0xb7, 0x78, 0x07, 0x30,
-	0xf8, 0x1d, 0x20, 0xed, 0x6b, 0xe7, 0x84, 0x70, 0xf9, 0xbc, 0x25, 0xbd, 0xfe, 0x1d, 0x58, 0x7f,
-	0xe2, 0xc7, 0xfe, 0xa9, 0x3f, 0xf2, 0xe9, 0x2c, 0x9f, 0x4d, 0xf3, 0x03, 0x65, 0x5e, 0xab, 0x95,
-	0x67, 0xde, 0x36, 0xeb, 0x90, 0x87, 0xe9, 0xb1, 0x55, 0xe7, 0x90, 0xab, 0x2c, 0xf4, 0x3e, 0xb4,
-	0x8e, 0xc2, 0x81, 0x3f, 0xf4, 0x53, 0x0f, 0xc8, 0x06, 0xa4, 0x3c, 0x97, 0x8a, 0xc2, 0xee, 0x3f,
-	0x35, 0xb8, 0x59, 0x8a, 0xfe, 0x4b, 0xc5, 0xc5, 0x42, 0x88, 0xf5, 0x2b, 0x42, 0xdc, 0x81, 0x7a,
-	0x62, 0x86, 0xb1, 0xc4, 0x8c, 0x44, 0x48, 0x0d, 0x36, 0x73, 0x41, 0xb0, 0x55, 0xd5, 0x60, 0xfb,
-	0x89, 0x01, 0xab, 0xc7, 0xe1, 0x68, 0xf4, 0xff, 0x47, 0xd7, 0xd1, 0xf2, 0xe8, 0x4a, 0x9f, 0x95,
-	0x94, 0xdd, 0xae, 0x16, 0x5b, 0x36, 0xd4, 0xbb, 0x53, 0x1a, 0x76, 0xfb, 0x49, 0x7d, 0x4a, 0x48,
-	0xa6, 0x5e, 0xb7, 0x7f, 0x8e, 0xbd, 0xe0, 0x8c, 0xf0, 0x5e, 0xd7, 0xc0, 0x29, 0xcd, 0x32, 0x16,
-	0x93, 0xe1, 0x49, 0xe4, 0x05, 0xb1, 0xd7, 0x67, 0xa7, 0xdc, 0x83, 0x81, 0xac, 0x56, 0x73, 0x7c,
-	0x74, 0x17, 0xea, 0xf7, 0x89, 0x37, 0x20, 0x51, 0x6c, 0xaf, 0xf0, 0x3a, 0xbc, 0x5d, 0xa2, 0x7c,
-	0x47, 0x8a, 0x88, 0xa6, 0x39, 0x99, 0xe0, 0xdc, 0x85, 0xa6, 0x3a, 0xf0, 0x4a, 0x6d, 0xec, 0x0f,
-	0x0d, 0x68, 0x8a, 0x1d, 0x64, 0xb0, 0xbd, 0x05, 0x37, 0xf2, 0x1a, 0x8b, 0x65, 0xf2, 0x4c, 0xd1,
-	0x8e, 0x0d, 0x13, 0x2f, 0x0d, 0xe4, 0xba, 0x39, 0xde, 0x75, 0x7b, 0x47, 0x3d, 0xaa, 0xcc, 0x97,
-	0x3a, 0xaa, 0x5e, 0xb1, 0x67, 0x40, 0x5f, 0xcb, 0x7c, 0x20, 0x9e, 0xe0, 0xde, 0xc8, 0xab, 0x28,
-	0x2f, 0x6e, 0xd7, 0xee, 0x84, 0xdb, 0xbf, 0xd3, 0x60, 0x7d, 0xce, 0x68, 0x74, 0x0b, 0xec, 0x39,
-	0x66, 0x76, 0x23, 0x47, 0xb0, 0x26, 0xcf, 0x59, 0x69, 0xaf, 0xa5, 0xa1, 0x35, 0x80, 0x6e, 0xff,
-	0x3c, 0xa1, 0xf9, 0xa3, 0x0f, 0x26, 0xdf, 0x23, 0x7d, 0x9a, 0xb0, 0x0c, 0xb4, 0x09, 0x16, 0x2f,
-	0x3f, 0xb3, 0xac, 0x24, 0x5a, 0xa6, 0x10, 0x8c, 0x49, 0x90, 0x94, 0x24, 0xab, 0x8a, 0x5e, 0x83,
-	0x0d, 0xd6, 0x02, 0x16, 0x6a, 0x95, 0x55, 0xbb, 0xfd, 0x6d, 0x68, 0x15, 0x3c, 0x86, 0x1c, 0xd8,
-	0x2a, 0xb0, 0x32, 0x3d, 0xeb, 0x60, 0x7c, 0x48, 0xa8, 0xa5, 0x21, 0x80, 0x9a, 0x38, 0xfc, 0xc4,
-	0x03, 0x58, 0x92, 0x25, 0x96, 0x81, 0x1a, 0x50, 0xdd, 0x1f, 0x85, 0x31, 0xb1, 0xcc, 0xbd, 0xcf,
-	0xea, 0x20, 0x9f, 0xef, 0xd1, 0x1d, 0x68, 0x30, 0x05, 0xc4, 0x2b, 0xf6, 0x8d, 0xdc, 0x63, 0xa8,
-	0xb3, 0xa6, 0xdc, 0xa6, 0xa7, 0x23, 0xea, 0x56, 0xd0, 0x3b, 0x60, 0xa5, 0xd2, 0xb1, 0x80, 0xed,
-	0x85, 0x93, 0x76, 0xb4, 0x5d, 0x0d, 0x7d, 0x5d, 0x7d, 0xf9, 0x0c, 0xc5, 0x7c, 0xb4, 0x3e, 0xf7,
-	0xac, 0xe8, 0x6c, 0x96, 0x3d, 0xc7, 0xba, 0x95, 0x5d, 0x0d, 0xbd, 0x07, 0x1b, 0xca, 0x0a, 0x12,
-	0x84, 0xd2, 0x35, 0x5a, 0x85, 0x67, 0x1c, 0x3e, 0x7d, 0x0f, 0x56, 0x99, 0xe6, 0x49, 0x35, 0x2c,
-	0xca, 0x38, 0x56, 0xf1, 0xe5, 0xc0, 0xad, 0xa0, 0x2f, 0x43, 0x53, 0xcc, 0x91, 0x49, 0x3b, 0x27,
-	0xe3, 0x64, 0xb6, 0xf3, 0xbf, 0x0b, 0x15, 0xf4, 0x0d, 0x01, 0x50, 0xee, 0xa1, 0xa0, 0x34, 0x81,
-	0x9c, 0x17, 0x5c, 0x13, 0xdd, 0x0a, 0xf2, 0xe6, 0xaf, 0x07, 0xe2, 0x56, 0x8a, 0xde, 0x28, 0x5b,
-	0x31, 0x77, 0x37, 0x76, 0xdc, 0x65, 0x22, 0xa9, 0x85, 0x7d, 0xd8, 0x2c, 0x6b, 0x6b, 0xd1, 0x9b,
-	0x99, 0xa5, 0x0b, 0x9b, 0x7b, 0xe7, 0xad, 0xe5, 0x42, 0xca, 0x26, 0x68, 0xfe, 0xdc, 0x45, 0x6e,
-	0xfe, 0xc4, 0x2c, 0xdd, 0xe1, 0xcd, 0xa5, 0x32, 0xc9, 0x06, 0x3c, 0xc0, 0xbe, 0x0b, 0x1b, 0x25,
-	0x4d, 0x5f, 0xb6, 0xcb, 0xe2, 0x76, 0x35, 0xdb, 0x65, 0x49, 0xd7, 0xe8, 0x56, 0xd0, 0xdb, 0x60,
-	0x1e, 0xfb, 0xc1, 0x19, 0xca, 0xfb, 0xdc, 0x41, 0x69, 0xf5, 0x4a, 0x7f, 0x7c, 0xf1, 0x44, 0x31,
-	0x59, 0xae, 0xa2, 0x8d, 0x92, 0xf2, 0x9b, 0x05, 0xb9, 0x5a, 0xf0, 0x84, 0x1d, 0xf7, 0x76, 0xfe,
-	0xfa, 0xbc, 0x5d, 0xf9, 0xd7, 0xf3, 0xb6, 0xf6, 0x9f, 0xe7, 0x6d, 0xed, 0xfb, 0x97, 0x6d, 0xed,
-	0xb7, 0x97, 0x6d, 0xed, 0xf7, 0x97, 0x6d, 0xed, 0xcf, 0x97, 0x6d, 0xed, 0x2f, 0x97, 0x6d, 0xed,
-	0x6f, 0x97, 0x6d, 0xed, 0xb3, 0xbf, 0xb7, 0x2b, 0xa7, 0x35, 0xfe, 0xcf, 0xed, 0x2b, 0xff, 0x0b,
-	0x00, 0x00, 0xff, 0xff, 0x65, 0xf6, 0xfa, 0x97, 0x9a, 0x1b, 0x00, 0x00,
+	// 2183 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x19, 0x4d, 0x6f, 0x1c, 0x49,
+	0x75, 0x7a, 0xba, 0xe7, 0xeb, 0xf9, 0xab, 0x5d, 0xf6, 0x3a, 0xbd, 0x9d, 0x30, 0xeb, 0xed, 0x44,
+	0xc8, 0xca, 0x66, 0x47, 0xc1, 0x08, 0xed, 0x0a, 0xb4, 0x2b, 0x26, 0xb6, 0x77, 0xe3, 0x25, 0x4e,
+	0xbc, 0x35, 0x76, 0x38, 0x70, 0x80, 0xf6, 0x4c, 0xd9, 0x69, 0x3c, 0xd3, 0x3d, 0xdb, 0x5d, 0xe3,
+	0x78, 0x6e, 0x20, 0xc4, 0x8d, 0x03, 0x12, 0xd2, 0xf2, 0x71, 0x40, 0x1c, 0x10, 0x42, 0xfc, 0x02,
+	0x04, 0x97, 0x3d, 0x72, 0xe4, 0xc8, 0x91, 0x18, 0x71, 0xe3, 0x80, 0xc4, 0x05, 0x89, 0x0b, 0xaa,
+	0x8f, 0xee, 0xa9, 0xfe, 0x98, 0x71, 0x1c, 0xcc, 0xde, 0xfa, 0xbd, 0x7a, 0x55, 0xef, 0xfb, 0xd5,
+	0x7b, 0xd5, 0xb0, 0x74, 0x3a, 0x3a, 0x22, 0x83, 0x4f, 0xbe, 0x7d, 0x12, 0xb4, 0x86, 0x61, 0x40,
+	0x03, 0x54, 0x15, 0x08, 0x1b, 0x4e, 0x82, 0x18, 0xe7, 0x7c, 0xaa, 0x01, 0xec, 0x7b, 0xfe, 0x09,
+	0x26, 0xd1, 0xa8, 0x4f, 0x11, 0x02, 0xe3, 0x61, 0x10, 0x51, 0x4b, 0x5b, 0xd7, 0x36, 0x1a, 0x98,
+	0x7f, 0x23, 0x0b, 0x6a, 0x4f, 0x49, 0x18, 0x79, 0x81, 0x6f, 0x95, 0x39, 0x3a, 0x06, 0xd1, 0x06,
+	0x2c, 0x75, 0x48, 0x78, 0x46, 0xc2, 0x0e, 0x75, 0x43, 0x7a, 0xe0, 0x0d, 0x88, 0xa5, 0xaf, 0x6b,
+	0x1b, 0x3a, 0xce, 0xa2, 0xd1, 0x7d, 0x58, 0x11, 0xa8, 0xc3, 0x21, 0x83, 0x3b, 0xa4, 0x1b, 0xf8,
+	0xbd, 0xc8, 0x32, 0x38, 0x75, 0xd1, 0x92, 0x53, 0x83, 0xca, 0xce, 0x60, 0x48, 0xc7, 0xce, 0x23,
+	0xa8, 0x4a, 0xe1, 0x2c, 0xa8, 0xed, 0x9c, 0x11, 0x9f, 0xee, 0x6e, 0x4b, 0xf9, 0x62, 0x90, 0x89,
+	0xdd, 0x21, 0x3e, 0xe5, 0xf2, 0xd5, 0x31, 0xff, 0x46, 0xab, 0x50, 0xd9, 0x09, 0xc3, 0x20, 0xe4,
+	0x22, 0x35, 0xb0, 0x00, 0x9c, 0x1f, 0x94, 0xa1, 0xc2, 0x77, 0xcd, 0x38, 0xcd, 0x86, 0xfa, 0x56,
+	0xdf, 0x13, 0x4b, 0x42, 0xe3, 0x04, 0x66, 0xbb, 0xb6, 0x9e, 0xb9, 0xbe, 0x4f, 0xfa, 0xf2, 0xdc,
+	0x18, 0x64, 0xbb, 0xf6, 0x08, 0x75, 0x7b, 0x2e, 0x75, 0xb9, 0x5e, 0x0d, 0x9c, 0xc0, 0x4c, 0xbe,
+	0x07, 0x41, 0x6f, 0x6c, 0x55, 0xd6, 0xb5, 0x8d, 0x79, 0xcc, 0xbf, 0x99, 0x7c, 0x1d, 0x1a, 0x84,
+	0xc4, 0xaa, 0x72, 0xa1, 0x05, 0x80, 0xde, 0x02, 0xe3, 0xc0, 0x3d, 0x89, 0xac, 0xda, 0xba, 0xbe,
+	0x31, 0xb7, 0x79, 0xa3, 0x25, 0x5c, 0xd6, 0xe2, 0xa2, 0xb5, 0xd8, 0xca, 0x8e, 0x4f, 0xc3, 0x31,
+	0xe6, 0x44, 0xf6, 0x3b, 0xd0, 0x48, 0x50, 0xc8, 0x04, 0xfd, 0x94, 0x8c, 0xa5, 0x2e, 0xec, 0x93,
+	0x71, 0x38, 0x73, 0xfb, 0x23, 0x22, 0x95, 0x10, 0xc0, 0x57, 0xcb, 0xef, 0x6a, 0xce, 0xcf, 0xcb,
+	0x30, 0xcf, 0x8f, 0xc4, 0xa4, 0x4b, 0xbc, 0x33, 0x32, 0xc3, 0x18, 0x8a, 0xc2, 0xe5, 0xe9, 0x0a,
+	0xeb, 0x53, 0x14, 0x36, 0x14, 0x85, 0x6f, 0x41, 0x83, 0x39, 0x38, 0xa2, 0xee, 0x60, 0xc8, 0x2d,
+	0xa1, 0xe3, 0x09, 0x82, 0x9d, 0xd6, 0x21, 0x9f, 0x8c, 0x88, 0xdf, 0x15, 0x16, 0x31, 0x70, 0x02,
+	0xa3, 0xcd, 0x94, 0x51, 0x9a, 0x29, 0xa3, 0x48, 0x0d, 0xae, 0xcf, 0x36, 0x7f, 0x34, 0xa0, 0xd1,
+	0x19, 0x1d, 0x45, 0xdd, 0xd0, 0x3b, 0x22, 0x68, 0x0f, 0x96, 0x13, 0xe0, 0x60, 0x3c, 0x24, 0xdb,
+	0x4c, 0x5b, 0x76, 0xce, 0xe2, 0xe6, 0x1b, 0xb1, 0x1c, 0x09, 0x41, 0x2b, 0x45, 0x8a, 0xf3, 0x3b,
+	0x5f, 0x31, 0xb4, 0x56, 0xa1, 0xf2, 0x61, 0x18, 0x8c, 0x86, 0x32, 0xae, 0x04, 0x80, 0x3a, 0xb0,
+	0xc2, 0x2d, 0x10, 0xf1, 0xc8, 0x49, 0x84, 0xab, 0x70, 0xe1, 0xde, 0xcc, 0x0b, 0x97, 0x21, 0xc6,
+	0x45, 0xbb, 0xd1, 0x26, 0xac, 0x66, 0xd0, 0x4f, 0xb9, 0x99, 0xaa, 0xdc, 0x5f, 0x85, 0x6b, 0x4e,
+	0x17, 0x16, 0x52, 0x9a, 0x22, 0x1b, 0xd6, 0x52, 0x88, 0x43, 0xbf, 0x47, 0x8e, 0x3d, 0x9f, 0xf4,
+	0xcc, 0x12, 0x02, 0xa8, 0x8a, 0x43, 0x4c, 0x0d, 0x2d, 0xc1, 0x9c, 0x72, 0xa0, 0x59, 0x46, 0xf3,
+	0x50, 0xdf, 0x0a, 0x06, 0x03, 0xd7, 0xef, 0x45, 0xa6, 0x8e, 0xe6, 0xa0, 0xf6, 0xf1, 0x88, 0x84,
+	0x1e, 0x89, 0x4c, 0xc3, 0xf9, 0xb5, 0x06, 0x4b, 0x19, 0xee, 0xe8, 0x16, 0x58, 0x19, 0x94, 0xca,
+	0xc9, 0x84, 0x79, 0x5e, 0x80, 0x1e, 0x93, 0xe7, 0x4f, 0xfc, 0xfe, 0xd8, 0xd4, 0x10, 0x82, 0x45,
+	0x8e, 0xf9, 0x20, 0x0c, 0x06, 0x1f, 0x78, 0x61, 0x44, 0xcd, 0x32, 0x5a, 0x86, 0x85, 0x04, 0xf7,
+	0xc8, 0x8d, 0xa8, 0xa9, 0xa3, 0x15, 0x58, 0xe2, 0xa8, 0x36, 0x8d, 0x23, 0xd0, 0x34, 0x98, 0xac,
+	0x12, 0xc9, 0x62, 0xd6, 0xac, 0xa0, 0x55, 0x30, 0x15, 0xc4, 0x36, 0xe9, 0x53, 0xd7, 0xac, 0x3a,
+	0x3f, 0x34, 0xa0, 0x86, 0xd9, 0xae, 0x88, 0xb2, 0x80, 0x97, 0x9f, 0x49, 0x5a, 0x4d, 0x10, 0x68,
+	0x07, 0x96, 0x24, 0x90, 0xb8, 0xae, 0xcc, 0x5d, 0x77, 0x33, 0x76, 0x9d, 0x5c, 0x6e, 0x29, 0x64,
+	0x38, 0xbb, 0x27, 0x15, 0x51, 0xfa, 0xf4, 0x88, 0x32, 0xa6, 0xe7, 0x6e, 0x65, 0x4a, 0xee, 0x56,
+	0x95, 0xdc, 0x75, 0x60, 0x1e, 0x93, 0x61, 0x7f, 0x1c, 0x1f, 0x57, 0xe3, 0x7b, 0x52, 0x38, 0xc6,
+	0x8d, 0x59, 0x22, 0x18, 0x51, 0xab, 0xbe, 0xae, 0x6d, 0x54, 0x70, 0x0c, 0x72, 0x19, 0xdd, 0xee,
+	0x33, 0xf2, 0x0d, 0x32, 0xb6, 0x1a, 0x52, 0x46, 0x09, 0x27, 0x6b, 0x07, 0x07, 0x8f, 0x2c, 0xe0,
+	0xdb, 0x12, 0x98, 0x97, 0xf5, 0xa1, 0xeb, 0x5b, 0x73, 0x42, 0x12, 0xf6, 0x8d, 0xde, 0x96, 0xb5,
+	0x60, 0x9e, 0xd7, 0x82, 0xd7, 0xb3, 0xb6, 0xba, 0xb6, 0x32, 0xf0, 0x1e, 0xcc, 0x29, 0xa6, 0x46,
+	0x6b, 0x80, 0x14, 0xf0, 0xd0, 0x3f, 0xf5, 0x83, 0xe7, 0xbe, 0x59, 0x62, 0x31, 0x2a, 0x23, 0xd6,
+	0xd4, 0x50, 0x03, 0x2a, 0x2c, 0x60, 0xc7, 0x66, 0xd9, 0xf9, 0xbe, 0x0e, 0x75, 0x4c, 0xa2, 0x61,
+	0xe0, 0x47, 0x24, 0xe5, 0x23, 0x2d, 0xe3, 0xa3, 0x54, 0x90, 0x94, 0xb3, 0x41, 0x92, 0xb5, 0xbb,
+	0x5e, 0x60, 0xf7, 0xab, 0x5e, 0x3c, 0xb1, 0xc5, 0x1f, 0x7a, 0x54, 0xde, 0x3d, 0x09, 0x9c, 0xae,
+	0xd1, 0xb5, 0x82, 0x1a, 0xbd, 0x73, 0x4e, 0xba, 0x23, 0x4a, 0x7a, 0xdc, 0xc5, 0x75, 0x9c, 0xc0,
+	0x93, 0xeb, 0xb6, 0xa1, 0x5c, 0xb7, 0x89, 0x07, 0x41, 0xf1, 0x60, 0x4b, 0x7a, 0x70, 0x8e, 0x7b,
+	0xd0, 0x9e, 0x78, 0x50, 0x58, 0xeb, 0xfa, 0x5c, 0xf8, 0xaf, 0x32, 0xcc, 0x7f, 0x3c, 0x22, 0x23,
+	0xb2, 0x47, 0xa2, 0xc8, 0x3d, 0x61, 0xf5, 0xa2, 0x21, 0x3f, 0x27, 0x09, 0x99, 0x20, 0x3e, 0xa7,
+	0x6b, 0x3f, 0xbe, 0xcb, 0xaa, 0xe9, 0xbb, 0x4c, 0x95, 0x33, 0x6b, 0x01, 0xf4, 0x3e, 0x40, 0x9b,
+	0xd2, 0xd0, 0x3b, 0x1a, 0x51, 0x12, 0x71, 0xb7, 0x4c, 0xd9, 0x39, 0xa1, 0xc2, 0xca, 0x0e, 0xb4,
+	0x09, 0xd5, 0xfd, 0xa0, 0xef, 0x75, 0xc7, 0xdc, 0x6b, 0x8a, 0xcd, 0xd5, 0xbd, 0x82, 0x02, 0x4b,
+	0xca, 0x57, 0xb7, 0xfa, 0x09, 0xbc, 0xae, 0x1e, 0x1b, 0x3d, 0x70, 0x69, 0xf7, 0x59, 0x5c, 0x12,
+	0x2d, 0xa8, 0x71, 0x78, 0xd2, 0x67, 0x48, 0x10, 0xdd, 0x67, 0x76, 0x14, 0x3b, 0xac, 0x32, 0xb7,
+	0xcd, 0x6a, 0x91, 0x94, 0x38, 0xa1, 0x72, 0x7e, 0xac, 0x81, 0x5d, 0xc4, 0x49, 0x26, 0xdd, 0x74,
+	0x56, 0xef, 0xb2, 0x12, 0xcd, 0x3a, 0xca, 0x98, 0x53, 0x62, 0xcb, 0x0e, 0xf1, 0x7b, 0x29, 0x6e,
+	0x9c, 0x0c, 0xc7, 0xe4, 0xa8, 0x09, 0xf0, 0xd0, 0x3d, 0x23, 0x3c, 0xb6, 0x23, 0x1e, 0x09, 0x75,
+	0xac, 0x60, 0x9c, 0x5f, 0x95, 0x61, 0xad, 0xd8, 0x1f, 0xe9, 0xcc, 0xd2, 0x66, 0x75, 0x3f, 0xe5,
+	0x4c, 0xf7, 0xc3, 0xa2, 0x76, 0xfb, 0x2b, 0x4f, 0x8e, 0x79, 0x28, 0xe9, 0x32, 0x6a, 0x63, 0x84,
+	0xa8, 0x10, 0xbc, 0x05, 0xda, 0x0a, 0x46, 0x3e, 0xe5, 0x31, 0x58, 0xc1, 0x29, 0x1c, 0x3b, 0x1d,
+	0x13, 0x1c, 0xf0, 0xbc, 0xad, 0x88, 0xbc, 0x8d, 0x61, 0x74, 0x0f, 0x96, 0xe3, 0x6f, 0x76, 0x05,
+	0x72, 0xe9, 0x79, 0x59, 0x68, 0xe0, 0xfc, 0x02, 0xe3, 0xb6, 0x73, 0x3e, 0xf4, 0x42, 0x97, 0x7a,
+	0x81, 0xdf, 0xa6, 0xb2, 0x44, 0xa4, 0x70, 0x4c, 0xde, 0x6d, 0xd2, 0x77, 0xc7, 0xa4, 0x77, 0x10,
+	0xf0, 0x80, 0xd3, 0xf1, 0x04, 0xe1, 0xfc, 0x41, 0x03, 0x94, 0x0f, 0x3b, 0x26, 0xc6, 0xe4, 0x90,
+	0x78, 0x3c, 0xd0, 0xb8, 0x2e, 0xf9, 0x05, 0x26, 0x06, 0x3f, 0x31, 0x26, 0x2c, 0x0b, 0xa5, 0x55,
+	0x1c, 0x1b, 0x4e, 0xf6, 0xdc, 0xf3, 0x94, 0x6d, 0x74, 0x4e, 0x96, 0x45, 0xa7, 0x29, 0x85, 0x01,
+	0x44, 0x26, 0x67, 0xd1, 0xce, 0x67, 0x1a, 0xac, 0x15, 0xc7, 0xc8, 0x25, 0xb5, 0x65, 0x0d, 0xaa,
+	0x6c, 0x28, 0x69, 0x8b, 0x11, 0x45, 0xc7, 0x12, 0xca, 0xd9, 0x53, 0xbf, 0xcc, 0x9e, 0x46, 0xc6,
+	0x9e, 0x2c, 0xcc, 0x77, 0x23, 0x51, 0x79, 0x85, 0x6b, 0x63, 0x70, 0x52, 0x91, 0xab, 0xea, 0x00,
+	0xf4, 0x77, 0x0d, 0x6e, 0xaa, 0x3a, 0xc5, 0xc9, 0xf3, 0x72, 0x4d, 0xcb, 0xab, 0xd5, 0xc8, 0xfb,
+	0xb0, 0xb2, 0xe7, 0x9e, 0x3f, 0x1e, 0x0d, 0x8e, 0x48, 0xf8, 0xe4, 0x38, 0x49, 0x73, 0x11, 0xaa,
+	0x45, 0x4b, 0xcc, 0x25, 0xdf, 0x74, 0x3d, 0xaa, 0xce, 0x8a, 0x15, 0xe1, 0xbc, 0x0c, 0x9a, 0x59,
+	0x76, 0x37, 0xda, 0x27, 0xee, 0xa9, 0xbc, 0xcb, 0x24, 0xe4, 0xfc, 0xa8, 0x0c, 0xb7, 0x8a, 0xf5,
+	0x94, 0xf5, 0x61, 0xb6, 0xa2, 0x57, 0x2e, 0x47, 0xe8, 0x2e, 0x98, 0x13, 0x1e, 0x9c, 0x6f, 0x4f,
+	0x06, 0x5c, 0x0e, 0xcf, 0x23, 0x4e, 0xe2, 0xb8, 0xab, 0x49, 0x4f, 0x1a, 0x23, 0x8b, 0x56, 0xd4,
+	0xab, 0xa8, 0xea, 0xa9, 0x6e, 0xaf, 0x4e, 0x71, 0x7b, 0x4d, 0x75, 0xfb, 0x2f, 0x34, 0xb0, 0xdb,
+	0xdd, 0xd3, 0x76, 0xbf, 0xff, 0xb9, 0x79, 0xbd, 0xc0, 0x87, 0x46, 0xa1, 0x0f, 0x9d, 0x9f, 0x6a,
+	0x70, 0xb3, 0x50, 0xb8, 0x97, 0x72, 0xd5, 0x5d, 0x30, 0xdb, 0xc7, 0xc7, 0xa4, 0x4b, 0x49, 0x4f,
+	0x71, 0x19, 0xab, 0xa1, 0x39, 0xbc, 0x6a, 0x36, 0x7d, 0x8a, 0xd9, 0x0c, 0xd5, 0x6c, 0xff, 0x29,
+	0x83, 0xdd, 0xa1, 0x21, 0x71, 0x07, 0xd7, 0x6c, 0xb6, 0x27, 0xf0, 0x9a, 0x38, 0x37, 0x3b, 0x03,
+	0xe8, 0x7c, 0x06, 0x48, 0xfa, 0xda, 0x1c, 0x11, 0x2e, 0xde, 0x37, 0xa3, 0xd7, 0xbf, 0x07, 0xcb,
+	0x4f, 0xbd, 0xc8, 0x3b, 0xf2, 0xfa, 0x1e, 0x1d, 0xa7, 0xb3, 0x29, 0xbf, 0x50, 0xe4, 0xb5, 0x6a,
+	0x71, 0xe6, 0xad, 0xb3, 0x0e, 0xf9, 0x38, 0xb9, 0xb6, 0x6a, 0xdc, 0xe4, 0x2a, 0x0a, 0xbd, 0x0f,
+	0x4b, 0x7b, 0x41, 0xcf, 0x3b, 0xf6, 0x12, 0x0f, 0xc8, 0x06, 0xa4, 0x38, 0x97, 0xb2, 0xc4, 0xce,
+	0x3f, 0x34, 0xb8, 0x59, 0x68, 0xfd, 0x97, 0x8a, 0x8b, 0xa9, 0x26, 0x2e, 0xbf, 0xa2, 0x89, 0x5b,
+	0x50, 0x8b, 0xd5, 0xd0, 0x67, 0xa8, 0x11, 0x13, 0xa9, 0xc1, 0x66, 0x4c, 0x09, 0xb6, 0x8a, 0x1a,
+	0x6c, 0x27, 0xf0, 0x1a, 0x3f, 0x28, 0x3a, 0x1c, 0x46, 0xaa, 0x00, 0xd7, 0x5d, 0xaa, 0x9c, 0xdf,
+	0x68, 0xb2, 0x4d, 0x51, 0x38, 0x49, 0x93, 0xf2, 0x76, 0xe2, 0x38, 0xcb, 0x2d, 0x85, 0xfb, 0x1f,
+	0xfa, 0xa7, 0xab, 0xa6, 0xdf, 0xa7, 0x06, 0xdc, 0x10, 0x82, 0x6e, 0x07, 0xcf, 0xfd, 0xab, 0x18,
+	0x65, 0x56, 0xee, 0xed, 0xe5, 0x27, 0x6f, 0x91, 0x75, 0xb7, 0x53, 0x76, 0xcb, 0xf3, 0x2c, 0x9e,
+	0xc0, 0x67, 0x4f, 0xd9, 0xee, 0xf9, 0x2e, 0x25, 0x83, 0x38, 0xe1, 0x12, 0x98, 0x65, 0x4f, 0x9c,
+	0x50, 0x6c, 0x62, 0x16, 0x39, 0xa6, 0xa2, 0xd8, 0xb9, 0xed, 0x11, 0x0d, 0xda, 0xdd, 0x53, 0x9e,
+	0x5b, 0x75, 0x1c, 0x83, 0xe8, 0x8b, 0xb0, 0x88, 0xc5, 0xad, 0x16, 0x33, 0xae, 0x73, 0xc6, 0x19,
+	0x2c, 0xba, 0x03, 0x0b, 0x71, 0x2e, 0x62, 0xd7, 0x3f, 0x21, 0x56, 0x63, 0x5d, 0xdf, 0xd0, 0x71,
+	0x1a, 0xc9, 0xea, 0x27, 0x26, 0xc7, 0x07, 0xa1, 0xeb, 0x47, 0x6e, 0x97, 0xf5, 0x1c, 0xbb, 0x3d,
+	0x3e, 0xaf, 0x35, 0x70, 0x0e, 0x8f, 0x76, 0x95, 0x69, 0x47, 0x4c, 0xe0, 0x6f, 0x5f, 0x62, 0xb3,
+	0x56, 0x4c, 0x2f, 0x06, 0x9a, 0x64, 0xbb, 0xfd, 0x35, 0x58, 0x48, 0x2d, 0x5d, 0x69, 0xc8, 0xf8,
+	0xa5, 0x0e, 0x56, 0x9e, 0xa1, 0x8c, 0xe1, 0x3b, 0xb0, 0x90, 0xd6, 0x46, 0x1c, 0x99, 0x46, 0x66,
+	0x22, 0xbd, 0x27, 0x79, 0xa4, 0x70, 0xd7, 0x1d, 0x29, 0x6a, 0xa6, 0x1a, 0x2f, 0xd5, 0x54, 0x5c,
+	0xb1, 0xbb, 0x43, 0x1f, 0x29, 0xfe, 0x11, 0xaf, 0xa5, 0xad, 0xe9, 0x92, 0xca, 0x79, 0xfb, 0xff,
+	0xe1, 0xa0, 0xbb, 0xbf, 0xd3, 0x60, 0x39, 0x57, 0x45, 0xd1, 0x2d, 0xb0, 0x72, 0xc8, 0xc9, 0x5b,
+	0x0a, 0x62, 0x61, 0xcd, 0x3b, 0x24, 0xa9, 0xbf, 0xa9, 0xa1, 0x45, 0x80, 0x76, 0xf7, 0x34, 0x86,
+	0xf9, 0x73, 0x1d, 0x26, 0xdf, 0x25, 0x5d, 0x1a, 0xa3, 0x74, 0xb4, 0x0a, 0x26, 0xbf, 0x38, 0xc6,
+	0x93, 0xcb, 0xcc, 0x34, 0x04, 0x61, 0x44, 0xfc, 0xf8, 0x32, 0x31, 0x2b, 0xe8, 0x06, 0xac, 0xb0,
+	0x02, 0x95, 0xb9, 0x65, 0xcc, 0xea, 0xdd, 0xcf, 0x34, 0xb8, 0x39, 0xc3, 0x91, 0xc8, 0x86, 0xb5,
+	0xfd, 0xa0, 0xdf, 0x2f, 0x14, 0xba, 0x06, 0xfa, 0x87, 0x84, 0x9a, 0x1a, 0x02, 0xa8, 0x8a, 0x1e,
+	0x46, 0xbc, 0x63, 0xb6, 0xbb, 0xa7, 0x3c, 0xbd, 0xc4, 0x3b, 0xe6, 0x63, 0xb9, 0x64, 0xa0, 0x05,
+	0x68, 0x3c, 0x4e, 0xd6, 0x2a, 0x4c, 0x3f, 0x99, 0xb4, 0x6c, 0xb9, 0x8a, 0x4c, 0x16, 0x95, 0x1c,
+	0x16, 0x14, 0x35, 0xa6, 0xc8, 0x56, 0x3f, 0x88, 0xc8, 0x83, 0xb1, 0x28, 0x60, 0x66, 0x5d, 0x41,
+	0x89, 0x3f, 0x27, 0x66, 0x63, 0xf3, 0x27, 0x75, 0x90, 0xbf, 0x77, 0xd0, 0x3d, 0x68, 0x30, 0x35,
+	0xc5, 0x5f, 0x8e, 0x85, 0xd4, 0x63, 0xb9, 0xbd, 0xa8, 0xbc, 0xb6, 0x8c, 0xfa, 0xd4, 0x29, 0xa1,
+	0x77, 0xc0, 0x4c, 0xa8, 0x23, 0xe1, 0x9c, 0x4b, 0x37, 0x6d, 0x68, 0xf7, 0x35, 0xf4, 0x75, 0xf5,
+	0x65, 0x3c, 0x10, 0xfb, 0xd1, 0x72, 0xee, 0xd9, 0xd9, 0x5e, 0x2d, 0x7a, 0xae, 0x77, 0x4a, 0xf7,
+	0x35, 0xf4, 0x1e, 0xac, 0x28, 0x27, 0x48, 0xeb, 0x16, 0x9e, 0xb1, 0x94, 0x79, 0xe6, 0xe3, 0xdb,
+	0x37, 0x61, 0x8e, 0x49, 0x1e, 0xdf, 0x07, 0x59, 0x1a, 0xdb, 0xcc, 0xbe, 0x2c, 0x39, 0x25, 0xf4,
+	0x25, 0x98, 0x17, 0x7b, 0x64, 0xa9, 0xc8, 0xd1, 0xd8, 0x13, 0xdd, 0xf9, 0xdf, 0xa7, 0x12, 0xfa,
+	0x48, 0x18, 0x28, 0xf5, 0x90, 0x54, 0x98, 0xb6, 0xf6, 0x25, 0xd7, 0xa0, 0x53, 0x42, 0x6e, 0x7e,
+	0x7c, 0x14, 0xaf, 0x16, 0xe8, 0xcd, 0xa2, 0x13, 0x53, 0x6f, 0x27, 0xb6, 0x33, 0x8b, 0x24, 0xd1,
+	0xb0, 0x0b, 0xab, 0x45, 0x63, 0x0f, 0xba, 0x3d, 0xd1, 0x74, 0xea, 0xf0, 0x67, 0xdf, 0x99, 0x4d,
+	0xa4, 0x30, 0x41, 0xf9, 0xbe, 0x0c, 0x39, 0xe9, 0x8e, 0xaa, 0x90, 0xc3, 0xed, 0x99, 0x34, 0x31,
+	0x03, 0x1e, 0x60, 0xdf, 0x81, 0x95, 0x82, 0xa1, 0x60, 0xc2, 0x65, 0xfa, 0x38, 0x33, 0xe1, 0x32,
+	0x63, 0xaa, 0x70, 0x4a, 0xe8, 0x2d, 0x30, 0xf6, 0x3d, 0xff, 0x04, 0xa5, 0x7d, 0x6e, 0xa3, 0x18,
+	0x9c, 0xfc, 0x18, 0x75, 0x4a, 0xe8, 0x5b, 0x60, 0x66, 0x6b, 0x04, 0x7a, 0xe3, 0x92, 0x6b, 0xc0,
+	0x5e, 0xbf, 0xac, 0xfa, 0x4a, 0x5d, 0x0f, 0x61, 0x31, 0xdd, 0x90, 0xa1, 0x2f, 0xa4, 0x77, 0x66,
+	0x5a, 0x42, 0xbb, 0x39, 0x6d, 0x59, 0x3d, 0xf6, 0xc1, 0xc6, 0x5f, 0x5e, 0x34, 0x4b, 0xff, 0x7c,
+	0xd1, 0xd4, 0xfe, 0xfd, 0xa2, 0xa9, 0x7d, 0xef, 0xa2, 0xa9, 0xfd, 0xf6, 0xa2, 0xa9, 0xfd, 0xfe,
+	0xa2, 0xa9, 0xfd, 0xe9, 0xa2, 0xa9, 0xfd, 0xf9, 0xa2, 0xa9, 0xfd, 0xf5, 0xa2, 0xa9, 0xfd, 0xec,
+	0x6f, 0xcd, 0xd2, 0x51, 0x95, 0xff, 0x0e, 0xfe, 0xf2, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x63,
+	0xe0, 0xc2, 0x22, 0x35, 0x1e, 0x00, 0x00,
 }
 
 func (this *PingResult) Equal(that interface{}) bool {
@@ -3116,14 +3290,90 @@ func (this *StreamQueueMessagesResponse) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *PollRequest) Equal(that interface{}) bool {
+func (this *QueuesUpstreamRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*PollRequest)
+	that1, ok := that.(*QueuesUpstreamRequest)
 	if !ok {
-		that2, ok := that.(PollRequest)
+		that2, ok := that.(QueuesUpstreamRequest)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.RequestID != that1.RequestID {
+		return false
+	}
+	if len(this.Messages) != len(that1.Messages) {
+		return false
+	}
+	for i := range this.Messages {
+		if !this.Messages[i].Equal(that1.Messages[i]) {
+			return false
+		}
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *QueuesUpstreamResponse) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueuesUpstreamResponse)
+	if !ok {
+		that2, ok := that.(QueuesUpstreamResponse)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.RefRequestID != that1.RefRequestID {
+		return false
+	}
+	if len(this.Results) != len(that1.Results) {
+		return false
+	}
+	for i := range this.Results {
+		if !this.Results[i].Equal(that1.Results[i]) {
+			return false
+		}
+	}
+	if this.IsError != that1.IsError {
+		return false
+	}
+	if this.Error != that1.Error {
+		return false
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *QueuesDownstreamRequest) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*QueuesDownstreamRequest)
+	if !ok {
+		that2, ok := that.(QueuesDownstreamRequest)
 		if ok {
 			that1 = &that2
 		} else {
@@ -3141,31 +3391,40 @@ func (this *PollRequest) Equal(that interface{}) bool {
 	if this.ClientID != that1.ClientID {
 		return false
 	}
-	if this.StreamRequestTypeData != that1.StreamRequestTypeData {
+	if this.RequestTypeData != that1.RequestTypeData {
 		return false
 	}
 	if this.Channel != that1.Channel {
 		return false
 	}
+	if this.MaxItems != that1.MaxItems {
+		return false
+	}
+	if this.WaitTimeout != that1.WaitTimeout {
+		return false
+	}
 	if this.AutoAck != that1.AutoAck {
 		return false
 	}
-	if len(this.AckRange) != len(that1.AckRange) {
+	if this.ReQueueChannel != that1.ReQueueChannel {
 		return false
 	}
-	for i := range this.AckRange {
-		if this.AckRange[i] != that1.AckRange[i] {
+	if len(this.SequenceRange) != len(that1.SequenceRange) {
+		return false
+	}
+	for i := range this.SequenceRange {
+		if this.SequenceRange[i] != that1.SequenceRange[i] {
 			return false
 		}
 	}
 	if this.RefTransactionId != that1.RefTransactionId {
 		return false
 	}
-	if len(this.Headers) != len(that1.Headers) {
+	if len(this.Metadata) != len(that1.Metadata) {
 		return false
 	}
-	for i := range this.Headers {
-		if this.Headers[i] != that1.Headers[i] {
+	for i := range this.Metadata {
+		if this.Metadata[i] != that1.Metadata[i] {
 			return false
 		}
 	}
@@ -3174,14 +3433,14 @@ func (this *PollRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *PollResponse) Equal(that interface{}) bool {
+func (this *QueuesDownstreamResponse) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*PollResponse)
+	that1, ok := that.(*QueuesDownstreamResponse)
 	if !ok {
-		that2, ok := that.(PollResponse)
+		that2, ok := that.(QueuesDownstreamResponse)
 		if ok {
 			that1 = &that2
 		} else {
@@ -3199,7 +3458,7 @@ func (this *PollResponse) Equal(that interface{}) bool {
 	if this.RefRequestId != that1.RefRequestId {
 		return false
 	}
-	if this.StreamRequestTypeData != that1.StreamRequestTypeData {
+	if this.RequestTypeData != that1.RequestTypeData {
 		return false
 	}
 	if len(this.Messages) != len(that1.Messages) {
@@ -3216,11 +3475,11 @@ func (this *PollResponse) Equal(that interface{}) bool {
 	if this.Error != that1.Error {
 		return false
 	}
-	if len(this.Headers) != len(that1.Headers) {
+	if len(this.Metadata) != len(that1.Metadata) {
 		return false
 	}
-	for i := range this.Headers {
-		if this.Headers[i] != that1.Headers[i] {
+	for i := range this.Metadata {
+		if this.Metadata[i] != that1.Metadata[i] {
 			return false
 		}
 	}
@@ -3658,31 +3917,15 @@ func (this *StreamQueueMessagesResponse) GoString() string {
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
-func (this *PollRequest) GoString() string {
+func (this *QueuesUpstreamRequest) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 12)
-	s = append(s, "&kubemq.PollRequest{")
+	s := make([]string, 0, 6)
+	s = append(s, "&kubemq.QueuesUpstreamRequest{")
 	s = append(s, "RequestID: "+fmt.Sprintf("%#v", this.RequestID)+",\n")
-	s = append(s, "ClientID: "+fmt.Sprintf("%#v", this.ClientID)+",\n")
-	s = append(s, "StreamRequestTypeData: "+fmt.Sprintf("%#v", this.StreamRequestTypeData)+",\n")
-	s = append(s, "Channel: "+fmt.Sprintf("%#v", this.Channel)+",\n")
-	s = append(s, "AutoAck: "+fmt.Sprintf("%#v", this.AutoAck)+",\n")
-	s = append(s, "AckRange: "+fmt.Sprintf("%#v", this.AckRange)+",\n")
-	s = append(s, "RefTransactionId: "+fmt.Sprintf("%#v", this.RefTransactionId)+",\n")
-	keysForHeaders := make([]string, 0, len(this.Headers))
-	for k, _ := range this.Headers {
-		keysForHeaders = append(keysForHeaders, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForHeaders)
-	mapStringForHeaders := "map[string]string{"
-	for _, k := range keysForHeaders {
-		mapStringForHeaders += fmt.Sprintf("%#v: %#v,", k, this.Headers[k])
-	}
-	mapStringForHeaders += "}"
-	if this.Headers != nil {
-		s = append(s, "Headers: "+mapStringForHeaders+",\n")
+	if this.Messages != nil {
+		s = append(s, "Messages: "+fmt.Sprintf("%#v", this.Messages)+",\n")
 	}
 	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
@@ -3690,32 +3933,85 @@ func (this *PollRequest) GoString() string {
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
-func (this *PollResponse) GoString() string {
+func (this *QueuesUpstreamResponse) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 8)
+	s = append(s, "&kubemq.QueuesUpstreamResponse{")
+	s = append(s, "RefRequestID: "+fmt.Sprintf("%#v", this.RefRequestID)+",\n")
+	if this.Results != nil {
+		s = append(s, "Results: "+fmt.Sprintf("%#v", this.Results)+",\n")
+	}
+	s = append(s, "IsError: "+fmt.Sprintf("%#v", this.IsError)+",\n")
+	s = append(s, "Error: "+fmt.Sprintf("%#v", this.Error)+",\n")
+	if this.XXX_unrecognized != nil {
+		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *QueuesDownstreamRequest) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 15)
+	s = append(s, "&kubemq.QueuesDownstreamRequest{")
+	s = append(s, "RequestID: "+fmt.Sprintf("%#v", this.RequestID)+",\n")
+	s = append(s, "ClientID: "+fmt.Sprintf("%#v", this.ClientID)+",\n")
+	s = append(s, "RequestTypeData: "+fmt.Sprintf("%#v", this.RequestTypeData)+",\n")
+	s = append(s, "Channel: "+fmt.Sprintf("%#v", this.Channel)+",\n")
+	s = append(s, "MaxItems: "+fmt.Sprintf("%#v", this.MaxItems)+",\n")
+	s = append(s, "WaitTimeout: "+fmt.Sprintf("%#v", this.WaitTimeout)+",\n")
+	s = append(s, "AutoAck: "+fmt.Sprintf("%#v", this.AutoAck)+",\n")
+	s = append(s, "ReQueueChannel: "+fmt.Sprintf("%#v", this.ReQueueChannel)+",\n")
+	s = append(s, "SequenceRange: "+fmt.Sprintf("%#v", this.SequenceRange)+",\n")
+	s = append(s, "RefTransactionId: "+fmt.Sprintf("%#v", this.RefTransactionId)+",\n")
+	keysForMetadata := make([]string, 0, len(this.Metadata))
+	for k, _ := range this.Metadata {
+		keysForMetadata = append(keysForMetadata, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForMetadata)
+	mapStringForMetadata := "map[string]string{"
+	for _, k := range keysForMetadata {
+		mapStringForMetadata += fmt.Sprintf("%#v: %#v,", k, this.Metadata[k])
+	}
+	mapStringForMetadata += "}"
+	if this.Metadata != nil {
+		s = append(s, "Metadata: "+mapStringForMetadata+",\n")
+	}
+	if this.XXX_unrecognized != nil {
+		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *QueuesDownstreamResponse) GoString() string {
 	if this == nil {
 		return "nil"
 	}
 	s := make([]string, 0, 11)
-	s = append(s, "&kubemq.PollResponse{")
+	s = append(s, "&kubemq.QueuesDownstreamResponse{")
 	s = append(s, "TransactionId: "+fmt.Sprintf("%#v", this.TransactionId)+",\n")
 	s = append(s, "RefRequestId: "+fmt.Sprintf("%#v", this.RefRequestId)+",\n")
-	s = append(s, "StreamRequestTypeData: "+fmt.Sprintf("%#v", this.StreamRequestTypeData)+",\n")
+	s = append(s, "RequestTypeData: "+fmt.Sprintf("%#v", this.RequestTypeData)+",\n")
 	if this.Messages != nil {
 		s = append(s, "Messages: "+fmt.Sprintf("%#v", this.Messages)+",\n")
 	}
 	s = append(s, "IsError: "+fmt.Sprintf("%#v", this.IsError)+",\n")
 	s = append(s, "Error: "+fmt.Sprintf("%#v", this.Error)+",\n")
-	keysForHeaders := make([]string, 0, len(this.Headers))
-	for k, _ := range this.Headers {
-		keysForHeaders = append(keysForHeaders, k)
+	keysForMetadata := make([]string, 0, len(this.Metadata))
+	for k, _ := range this.Metadata {
+		keysForMetadata = append(keysForMetadata, k)
 	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForHeaders)
-	mapStringForHeaders := "map[string]string{"
-	for _, k := range keysForHeaders {
-		mapStringForHeaders += fmt.Sprintf("%#v: %#v,", k, this.Headers[k])
+	github_com_gogo_protobuf_sortkeys.Strings(keysForMetadata)
+	mapStringForMetadata := "map[string]string{"
+	for _, k := range keysForMetadata {
+		mapStringForMetadata += fmt.Sprintf("%#v: %#v,", k, this.Metadata[k])
 	}
-	mapStringForHeaders += "}"
-	if this.Headers != nil {
-		s = append(s, "Headers: "+mapStringForHeaders+",\n")
+	mapStringForMetadata += "}"
+	if this.Metadata != nil {
+		s = append(s, "Metadata: "+mapStringForMetadata+",\n")
 	}
 	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
@@ -3756,7 +4052,8 @@ type KubemqClient interface {
 	StreamQueueMessage(ctx context.Context, opts ...grpc.CallOption) (Kubemq_StreamQueueMessageClient, error)
 	AckAllQueueMessages(ctx context.Context, in *AckAllQueueMessagesRequest, opts ...grpc.CallOption) (*AckAllQueueMessagesResponse, error)
 	Ping(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PingResult, error)
-	Poll(ctx context.Context, opts ...grpc.CallOption) (Kubemq_PollClient, error)
+	QueuesDownstream(ctx context.Context, opts ...grpc.CallOption) (Kubemq_QueuesDownstreamClient, error)
+	QueuesUpstream(ctx context.Context, opts ...grpc.CallOption) (Kubemq_QueuesUpstreamClient, error)
 }
 
 type kubemqClient struct {
@@ -3965,31 +4262,62 @@ func (c *kubemqClient) Ping(ctx context.Context, in *Empty, opts ...grpc.CallOpt
 	return out, nil
 }
 
-func (c *kubemqClient) Poll(ctx context.Context, opts ...grpc.CallOption) (Kubemq_PollClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Kubemq_serviceDesc.Streams[4], "/kubemq.kubemq/Poll", opts...)
+func (c *kubemqClient) QueuesDownstream(ctx context.Context, opts ...grpc.CallOption) (Kubemq_QueuesDownstreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Kubemq_serviceDesc.Streams[4], "/kubemq.kubemq/QueuesDownstream", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &kubemqPollClient{stream}
+	x := &kubemqQueuesDownstreamClient{stream}
 	return x, nil
 }
 
-type Kubemq_PollClient interface {
-	Send(*PollRequest) error
-	Recv() (*PollResponse, error)
+type Kubemq_QueuesDownstreamClient interface {
+	Send(*QueuesDownstreamRequest) error
+	Recv() (*QueuesDownstreamResponse, error)
 	grpc.ClientStream
 }
 
-type kubemqPollClient struct {
+type kubemqQueuesDownstreamClient struct {
 	grpc.ClientStream
 }
 
-func (x *kubemqPollClient) Send(m *PollRequest) error {
+func (x *kubemqQueuesDownstreamClient) Send(m *QueuesDownstreamRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *kubemqPollClient) Recv() (*PollResponse, error) {
-	m := new(PollResponse)
+func (x *kubemqQueuesDownstreamClient) Recv() (*QueuesDownstreamResponse, error) {
+	m := new(QueuesDownstreamResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *kubemqClient) QueuesUpstream(ctx context.Context, opts ...grpc.CallOption) (Kubemq_QueuesUpstreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Kubemq_serviceDesc.Streams[5], "/kubemq.kubemq/QueuesUpstream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &kubemqQueuesUpstreamClient{stream}
+	return x, nil
+}
+
+type Kubemq_QueuesUpstreamClient interface {
+	Send(*QueuesUpstreamRequest) error
+	Recv() (*QueuesUpstreamResponse, error)
+	grpc.ClientStream
+}
+
+type kubemqQueuesUpstreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *kubemqQueuesUpstreamClient) Send(m *QueuesUpstreamRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *kubemqQueuesUpstreamClient) Recv() (*QueuesUpstreamResponse, error) {
+	m := new(QueuesUpstreamResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -4010,7 +4338,8 @@ type KubemqServer interface {
 	StreamQueueMessage(Kubemq_StreamQueueMessageServer) error
 	AckAllQueueMessages(context.Context, *AckAllQueueMessagesRequest) (*AckAllQueueMessagesResponse, error)
 	Ping(context.Context, *Empty) (*PingResult, error)
-	Poll(Kubemq_PollServer) error
+	QueuesDownstream(Kubemq_QueuesDownstreamServer) error
+	QueuesUpstream(Kubemq_QueuesUpstreamServer) error
 }
 
 func RegisterKubemqServer(s *grpc.Server, srv KubemqServer) {
@@ -4255,26 +4584,52 @@ func _Kubemq_Ping_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Kubemq_Poll_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(KubemqServer).Poll(&kubemqPollServer{stream})
+func _Kubemq_QueuesDownstream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(KubemqServer).QueuesDownstream(&kubemqQueuesDownstreamServer{stream})
 }
 
-type Kubemq_PollServer interface {
-	Send(*PollResponse) error
-	Recv() (*PollRequest, error)
+type Kubemq_QueuesDownstreamServer interface {
+	Send(*QueuesDownstreamResponse) error
+	Recv() (*QueuesDownstreamRequest, error)
 	grpc.ServerStream
 }
 
-type kubemqPollServer struct {
+type kubemqQueuesDownstreamServer struct {
 	grpc.ServerStream
 }
 
-func (x *kubemqPollServer) Send(m *PollResponse) error {
+func (x *kubemqQueuesDownstreamServer) Send(m *QueuesDownstreamResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *kubemqPollServer) Recv() (*PollRequest, error) {
-	m := new(PollRequest)
+func (x *kubemqQueuesDownstreamServer) Recv() (*QueuesDownstreamRequest, error) {
+	m := new(QueuesDownstreamRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _Kubemq_QueuesUpstream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(KubemqServer).QueuesUpstream(&kubemqQueuesUpstreamServer{stream})
+}
+
+type Kubemq_QueuesUpstreamServer interface {
+	Send(*QueuesUpstreamResponse) error
+	Recv() (*QueuesUpstreamRequest, error)
+	grpc.ServerStream
+}
+
+type kubemqQueuesUpstreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *kubemqQueuesUpstreamServer) Send(m *QueuesUpstreamResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *kubemqQueuesUpstreamServer) Recv() (*QueuesUpstreamRequest, error) {
+	m := new(QueuesUpstreamRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -4342,8 +4697,14 @@ var _Kubemq_serviceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 		{
-			StreamName:    "Poll",
-			Handler:       _Kubemq_Poll_Handler,
+			StreamName:    "QueuesDownstream",
+			Handler:       _Kubemq_QueuesDownstream_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "QueuesUpstream",
+			Handler:       _Kubemq_QueuesUpstream_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
@@ -5565,7 +5926,7 @@ func (m *StreamQueueMessagesResponse) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *PollRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueuesUpstreamRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -5575,7 +5936,101 @@ func (m *PollRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *PollRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueuesUpstreamRequest) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.RequestID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.RequestID)))
+		i += copy(dAtA[i:], m.RequestID)
+	}
+	if len(m.Messages) > 0 {
+		for _, msg := range m.Messages {
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintKubemqGo(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *QueuesUpstreamResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueuesUpstreamResponse) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.RefRequestID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.RefRequestID)))
+		i += copy(dAtA[i:], m.RefRequestID)
+	}
+	if len(m.Results) > 0 {
+		for _, msg := range m.Results {
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintKubemqGo(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.IsError {
+		dAtA[i] = 0x18
+		i++
+		if m.IsError {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if len(m.Error) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.Error)))
+		i += copy(dAtA[i:], m.Error)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *QueuesDownstreamRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueuesDownstreamRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -5592,10 +6047,10 @@ func (m *PollRequest) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.ClientID)))
 		i += copy(dAtA[i:], m.ClientID)
 	}
-	if m.StreamRequestTypeData != 0 {
+	if m.RequestTypeData != 0 {
 		dAtA[i] = 0x18
 		i++
-		i = encodeVarintKubemqGo(dAtA, i, uint64(m.StreamRequestTypeData))
+		i = encodeVarintKubemqGo(dAtA, i, uint64(m.RequestTypeData))
 	}
 	if len(m.Channel) > 0 {
 		dAtA[i] = 0x22
@@ -5603,8 +6058,18 @@ func (m *PollRequest) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.Channel)))
 		i += copy(dAtA[i:], m.Channel)
 	}
-	if m.AutoAck {
+	if m.MaxItems != 0 {
 		dAtA[i] = 0x28
+		i++
+		i = encodeVarintKubemqGo(dAtA, i, uint64(m.MaxItems))
+	}
+	if m.WaitTimeout != 0 {
+		dAtA[i] = 0x30
+		i++
+		i = encodeVarintKubemqGo(dAtA, i, uint64(m.WaitTimeout))
+	}
+	if m.AutoAck {
+		dAtA[i] = 0x38
 		i++
 		if m.AutoAck {
 			dAtA[i] = 1
@@ -5613,10 +6078,16 @@ func (m *PollRequest) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i++
 	}
-	if len(m.AckRange) > 0 {
-		dAtA6 := make([]byte, len(m.AckRange)*10)
+	if len(m.ReQueueChannel) > 0 {
+		dAtA[i] = 0x42
+		i++
+		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.ReQueueChannel)))
+		i += copy(dAtA[i:], m.ReQueueChannel)
+	}
+	if len(m.SequenceRange) > 0 {
+		dAtA6 := make([]byte, len(m.SequenceRange)*10)
 		var j5 int
-		for _, num1 := range m.AckRange {
+		for _, num1 := range m.SequenceRange {
 			num := uint64(num1)
 			for num >= 1<<7 {
 				dAtA6[j5] = uint8(uint64(num)&0x7f | 0x80)
@@ -5626,22 +6097,22 @@ func (m *PollRequest) MarshalTo(dAtA []byte) (int, error) {
 			dAtA6[j5] = uint8(num)
 			j5++
 		}
-		dAtA[i] = 0x32
+		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintKubemqGo(dAtA, i, uint64(j5))
 		i += copy(dAtA[i:], dAtA6[:j5])
 	}
 	if len(m.RefTransactionId) > 0 {
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x52
 		i++
 		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.RefTransactionId)))
 		i += copy(dAtA[i:], m.RefTransactionId)
 	}
-	if len(m.Headers) > 0 {
-		for k, _ := range m.Headers {
-			dAtA[i] = 0x42
+	if len(m.Metadata) > 0 {
+		for k, _ := range m.Metadata {
+			dAtA[i] = 0x62
 			i++
-			v := m.Headers[k]
+			v := m.Metadata[k]
 			mapSize := 1 + len(k) + sovKubemqGo(uint64(len(k))) + 1 + len(v) + sovKubemqGo(uint64(len(v)))
 			i = encodeVarintKubemqGo(dAtA, i, uint64(mapSize))
 			dAtA[i] = 0xa
@@ -5660,7 +6131,7 @@ func (m *PollRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *PollResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueuesDownstreamResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -5670,7 +6141,7 @@ func (m *PollResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *PollResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueuesDownstreamResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -5687,10 +6158,10 @@ func (m *PollResponse) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.RefRequestId)))
 		i += copy(dAtA[i:], m.RefRequestId)
 	}
-	if m.StreamRequestTypeData != 0 {
+	if m.RequestTypeData != 0 {
 		dAtA[i] = 0x18
 		i++
-		i = encodeVarintKubemqGo(dAtA, i, uint64(m.StreamRequestTypeData))
+		i = encodeVarintKubemqGo(dAtA, i, uint64(m.RequestTypeData))
 	}
 	if len(m.Messages) > 0 {
 		for _, msg := range m.Messages {
@@ -5720,11 +6191,11 @@ func (m *PollResponse) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintKubemqGo(dAtA, i, uint64(len(m.Error)))
 		i += copy(dAtA[i:], m.Error)
 	}
-	if len(m.Headers) > 0 {
-		for k, _ := range m.Headers {
+	if len(m.Metadata) > 0 {
+		for k, _ := range m.Metadata {
 			dAtA[i] = 0x3a
 			i++
-			v := m.Headers[k]
+			v := m.Metadata[k]
 			mapSize := 1 + len(k) + sovKubemqGo(uint64(len(k))) + 1 + len(v) + sovKubemqGo(uint64(len(v)))
 			i = encodeVarintKubemqGo(dAtA, i, uint64(mapSize))
 			dAtA[i] = 0xa
@@ -6183,54 +6654,97 @@ func NewPopulatedStreamQueueMessagesResponse(r randyKubemqGo, easy bool) *Stream
 	return this
 }
 
-func NewPopulatedPollRequest(r randyKubemqGo, easy bool) *PollRequest {
-	this := &PollRequest{}
+func NewPopulatedQueuesUpstreamRequest(r randyKubemqGo, easy bool) *QueuesUpstreamRequest {
+	this := &QueuesUpstreamRequest{}
 	this.RequestID = string(randStringKubemqGo(r))
-	this.ClientID = string(randStringKubemqGo(r))
-	this.StreamRequestTypeData = PollRequestType([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
-	this.Channel = string(randStringKubemqGo(r))
-	this.AutoAck = bool(bool(r.Intn(2) == 0))
-	v16 := r.Intn(10)
-	this.AckRange = make([]int64, v16)
-	for i := 0; i < v16; i++ {
-		this.AckRange[i] = int64(r.Int63())
-		if r.Intn(2) == 0 {
-			this.AckRange[i] *= -1
-		}
-	}
-	this.RefTransactionId = string(randStringKubemqGo(r))
 	if r.Intn(10) != 0 {
-		v17 := r.Intn(10)
-		this.Headers = make(map[string]string)
-		for i := 0; i < v17; i++ {
-			this.Headers[randStringKubemqGo(r)] = randStringKubemqGo(r)
+		v16 := r.Intn(5)
+		this.Messages = make([]*QueueMessage, v16)
+		for i := 0; i < v16; i++ {
+			this.Messages[i] = NewPopulatedQueueMessage(r, easy)
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
-		this.XXX_unrecognized = randUnrecognizedKubemqGo(r, 9)
+		this.XXX_unrecognized = randUnrecognizedKubemqGo(r, 3)
 	}
 	return this
 }
 
-func NewPopulatedPollResponse(r randyKubemqGo, easy bool) *PollResponse {
-	this := &PollResponse{}
+func NewPopulatedQueuesUpstreamResponse(r randyKubemqGo, easy bool) *QueuesUpstreamResponse {
+	this := &QueuesUpstreamResponse{}
+	this.RefRequestID = string(randStringKubemqGo(r))
+	if r.Intn(10) != 0 {
+		v17 := r.Intn(5)
+		this.Results = make([]*SendQueueMessageResult, v17)
+		for i := 0; i < v17; i++ {
+			this.Results[i] = NewPopulatedSendQueueMessageResult(r, easy)
+		}
+	}
+	this.IsError = bool(bool(r.Intn(2) == 0))
+	this.Error = string(randStringKubemqGo(r))
+	if !easy && r.Intn(10) != 0 {
+		this.XXX_unrecognized = randUnrecognizedKubemqGo(r, 5)
+	}
+	return this
+}
+
+func NewPopulatedQueuesDownstreamRequest(r randyKubemqGo, easy bool) *QueuesDownstreamRequest {
+	this := &QueuesDownstreamRequest{}
+	this.RequestID = string(randStringKubemqGo(r))
+	this.ClientID = string(randStringKubemqGo(r))
+	this.RequestTypeData = QueuesDownstreamRequestType([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}[r.Intn(10)])
+	this.Channel = string(randStringKubemqGo(r))
+	this.MaxItems = int32(r.Int31())
+	if r.Intn(2) == 0 {
+		this.MaxItems *= -1
+	}
+	this.WaitTimeout = int32(r.Int31())
+	if r.Intn(2) == 0 {
+		this.WaitTimeout *= -1
+	}
+	this.AutoAck = bool(bool(r.Intn(2) == 0))
+	this.ReQueueChannel = string(randStringKubemqGo(r))
+	v18 := r.Intn(10)
+	this.SequenceRange = make([]int64, v18)
+	for i := 0; i < v18; i++ {
+		this.SequenceRange[i] = int64(r.Int63())
+		if r.Intn(2) == 0 {
+			this.SequenceRange[i] *= -1
+		}
+	}
+	this.RefTransactionId = string(randStringKubemqGo(r))
+	if r.Intn(10) != 0 {
+		v19 := r.Intn(10)
+		this.Metadata = make(map[string]string)
+		for i := 0; i < v19; i++ {
+			this.Metadata[randStringKubemqGo(r)] = randStringKubemqGo(r)
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+		this.XXX_unrecognized = randUnrecognizedKubemqGo(r, 13)
+	}
+	return this
+}
+
+func NewPopulatedQueuesDownstreamResponse(r randyKubemqGo, easy bool) *QueuesDownstreamResponse {
+	this := &QueuesDownstreamResponse{}
 	this.TransactionId = string(randStringKubemqGo(r))
 	this.RefRequestId = string(randStringKubemqGo(r))
-	this.StreamRequestTypeData = PollRequestType([]int32{0, 1, 2, 3, 4}[r.Intn(5)])
+	this.RequestTypeData = QueuesDownstreamRequestType([]int32{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}[r.Intn(10)])
 	if r.Intn(10) != 0 {
-		v18 := r.Intn(5)
-		this.Messages = make([]*QueueMessage, v18)
-		for i := 0; i < v18; i++ {
+		v20 := r.Intn(5)
+		this.Messages = make([]*QueueMessage, v20)
+		for i := 0; i < v20; i++ {
 			this.Messages[i] = NewPopulatedQueueMessage(r, easy)
 		}
 	}
 	this.IsError = bool(bool(r.Intn(2) == 0))
 	this.Error = string(randStringKubemqGo(r))
 	if r.Intn(10) != 0 {
-		v19 := r.Intn(10)
-		this.Headers = make(map[string]string)
-		for i := 0; i < v19; i++ {
-			this.Headers[randStringKubemqGo(r)] = randStringKubemqGo(r)
+		v21 := r.Intn(10)
+		this.Metadata = make(map[string]string)
+		for i := 0; i < v21; i++ {
+			this.Metadata[randStringKubemqGo(r)] = randStringKubemqGo(r)
 		}
 	}
 	if !easy && r.Intn(10) != 0 {
@@ -6258,9 +6772,9 @@ func randUTF8RuneKubemqGo(r randyKubemqGo) rune {
 	return rune(ru + 61)
 }
 func randStringKubemqGo(r randyKubemqGo) string {
-	v20 := r.Intn(100)
-	tmps := make([]rune, v20)
-	for i := 0; i < v20; i++ {
+	v22 := r.Intn(100)
+	tmps := make([]rune, v22)
+	for i := 0; i < v22; i++ {
 		tmps[i] = randUTF8RuneKubemqGo(r)
 	}
 	return string(tmps)
@@ -6282,11 +6796,11 @@ func randFieldKubemqGo(dAtA []byte, r randyKubemqGo, fieldNumber int, wire int) 
 	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateKubemqGo(dAtA, uint64(key))
-		v21 := r.Int63()
+		v23 := r.Int63()
 		if r.Intn(2) == 0 {
-			v21 *= -1
+			v23 *= -1
 		}
-		dAtA = encodeVarintPopulateKubemqGo(dAtA, uint64(v21))
+		dAtA = encodeVarintPopulateKubemqGo(dAtA, uint64(v23))
 	case 1:
 		dAtA = encodeVarintPopulateKubemqGo(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
@@ -6992,7 +7506,58 @@ func (m *StreamQueueMessagesResponse) Size() (n int) {
 	return n
 }
 
-func (m *PollRequest) Size() (n int) {
+func (m *QueuesUpstreamRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RequestID)
+	if l > 0 {
+		n += 1 + l + sovKubemqGo(uint64(l))
+	}
+	if len(m.Messages) > 0 {
+		for _, e := range m.Messages {
+			l = e.Size()
+			n += 1 + l + sovKubemqGo(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *QueuesUpstreamResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RefRequestID)
+	if l > 0 {
+		n += 1 + l + sovKubemqGo(uint64(l))
+	}
+	if len(m.Results) > 0 {
+		for _, e := range m.Results {
+			l = e.Size()
+			n += 1 + l + sovKubemqGo(uint64(l))
+		}
+	}
+	if m.IsError {
+		n += 2
+	}
+	l = len(m.Error)
+	if l > 0 {
+		n += 1 + l + sovKubemqGo(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *QueuesDownstreamRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -7006,19 +7571,29 @@ func (m *PollRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovKubemqGo(uint64(l))
 	}
-	if m.StreamRequestTypeData != 0 {
-		n += 1 + sovKubemqGo(uint64(m.StreamRequestTypeData))
+	if m.RequestTypeData != 0 {
+		n += 1 + sovKubemqGo(uint64(m.RequestTypeData))
 	}
 	l = len(m.Channel)
 	if l > 0 {
 		n += 1 + l + sovKubemqGo(uint64(l))
 	}
+	if m.MaxItems != 0 {
+		n += 1 + sovKubemqGo(uint64(m.MaxItems))
+	}
+	if m.WaitTimeout != 0 {
+		n += 1 + sovKubemqGo(uint64(m.WaitTimeout))
+	}
 	if m.AutoAck {
 		n += 2
 	}
-	if len(m.AckRange) > 0 {
+	l = len(m.ReQueueChannel)
+	if l > 0 {
+		n += 1 + l + sovKubemqGo(uint64(l))
+	}
+	if len(m.SequenceRange) > 0 {
 		l = 0
-		for _, e := range m.AckRange {
+		for _, e := range m.SequenceRange {
 			l += sovKubemqGo(uint64(e))
 		}
 		n += 1 + sovKubemqGo(uint64(l)) + l
@@ -7027,8 +7602,8 @@ func (m *PollRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovKubemqGo(uint64(l))
 	}
-	if len(m.Headers) > 0 {
-		for k, v := range m.Headers {
+	if len(m.Metadata) > 0 {
+		for k, v := range m.Metadata {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovKubemqGo(uint64(len(k))) + 1 + len(v) + sovKubemqGo(uint64(len(v)))
@@ -7041,7 +7616,7 @@ func (m *PollRequest) Size() (n int) {
 	return n
 }
 
-func (m *PollResponse) Size() (n int) {
+func (m *QueuesDownstreamResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -7055,8 +7630,8 @@ func (m *PollResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovKubemqGo(uint64(l))
 	}
-	if m.StreamRequestTypeData != 0 {
-		n += 1 + sovKubemqGo(uint64(m.StreamRequestTypeData))
+	if m.RequestTypeData != 0 {
+		n += 1 + sovKubemqGo(uint64(m.RequestTypeData))
 	}
 	if len(m.Messages) > 0 {
 		for _, e := range m.Messages {
@@ -7071,8 +7646,8 @@ func (m *PollResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovKubemqGo(uint64(l))
 	}
-	if len(m.Headers) > 0 {
-		for k, v := range m.Headers {
+	if len(m.Metadata) > 0 {
+		for k, v := range m.Metadata {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovKubemqGo(uint64(len(k))) + 1 + len(v) + sovKubemqGo(uint64(len(v)))
@@ -7463,56 +8038,85 @@ func (this *StreamQueueMessagesResponse) String() string {
 	}, "")
 	return s
 }
-func (this *PollRequest) String() string {
+func (this *QueuesUpstreamRequest) String() string {
 	if this == nil {
 		return "nil"
 	}
-	keysForHeaders := make([]string, 0, len(this.Headers))
-	for k, _ := range this.Headers {
-		keysForHeaders = append(keysForHeaders, k)
-	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForHeaders)
-	mapStringForHeaders := "map[string]string{"
-	for _, k := range keysForHeaders {
-		mapStringForHeaders += fmt.Sprintf("%v: %v,", k, this.Headers[k])
-	}
-	mapStringForHeaders += "}"
-	s := strings.Join([]string{`&PollRequest{`,
+	s := strings.Join([]string{`&QueuesUpstreamRequest{`,
 		`RequestID:` + fmt.Sprintf("%v", this.RequestID) + `,`,
-		`ClientID:` + fmt.Sprintf("%v", this.ClientID) + `,`,
-		`StreamRequestTypeData:` + fmt.Sprintf("%v", this.StreamRequestTypeData) + `,`,
-		`Channel:` + fmt.Sprintf("%v", this.Channel) + `,`,
-		`AutoAck:` + fmt.Sprintf("%v", this.AutoAck) + `,`,
-		`AckRange:` + fmt.Sprintf("%v", this.AckRange) + `,`,
-		`RefTransactionId:` + fmt.Sprintf("%v", this.RefTransactionId) + `,`,
-		`Headers:` + mapStringForHeaders + `,`,
+		`Messages:` + strings.Replace(fmt.Sprintf("%v", this.Messages), "QueueMessage", "QueueMessage", 1) + `,`,
 		`XXX_unrecognized:` + fmt.Sprintf("%v", this.XXX_unrecognized) + `,`,
 		`}`,
 	}, "")
 	return s
 }
-func (this *PollResponse) String() string {
+func (this *QueuesUpstreamResponse) String() string {
 	if this == nil {
 		return "nil"
 	}
-	keysForHeaders := make([]string, 0, len(this.Headers))
-	for k, _ := range this.Headers {
-		keysForHeaders = append(keysForHeaders, k)
+	s := strings.Join([]string{`&QueuesUpstreamResponse{`,
+		`RefRequestID:` + fmt.Sprintf("%v", this.RefRequestID) + `,`,
+		`Results:` + strings.Replace(fmt.Sprintf("%v", this.Results), "SendQueueMessageResult", "SendQueueMessageResult", 1) + `,`,
+		`IsError:` + fmt.Sprintf("%v", this.IsError) + `,`,
+		`Error:` + fmt.Sprintf("%v", this.Error) + `,`,
+		`XXX_unrecognized:` + fmt.Sprintf("%v", this.XXX_unrecognized) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *QueuesDownstreamRequest) String() string {
+	if this == nil {
+		return "nil"
 	}
-	github_com_gogo_protobuf_sortkeys.Strings(keysForHeaders)
-	mapStringForHeaders := "map[string]string{"
-	for _, k := range keysForHeaders {
-		mapStringForHeaders += fmt.Sprintf("%v: %v,", k, this.Headers[k])
+	keysForMetadata := make([]string, 0, len(this.Metadata))
+	for k, _ := range this.Metadata {
+		keysForMetadata = append(keysForMetadata, k)
 	}
-	mapStringForHeaders += "}"
-	s := strings.Join([]string{`&PollResponse{`,
+	github_com_gogo_protobuf_sortkeys.Strings(keysForMetadata)
+	mapStringForMetadata := "map[string]string{"
+	for _, k := range keysForMetadata {
+		mapStringForMetadata += fmt.Sprintf("%v: %v,", k, this.Metadata[k])
+	}
+	mapStringForMetadata += "}"
+	s := strings.Join([]string{`&QueuesDownstreamRequest{`,
+		`RequestID:` + fmt.Sprintf("%v", this.RequestID) + `,`,
+		`ClientID:` + fmt.Sprintf("%v", this.ClientID) + `,`,
+		`RequestTypeData:` + fmt.Sprintf("%v", this.RequestTypeData) + `,`,
+		`Channel:` + fmt.Sprintf("%v", this.Channel) + `,`,
+		`MaxItems:` + fmt.Sprintf("%v", this.MaxItems) + `,`,
+		`WaitTimeout:` + fmt.Sprintf("%v", this.WaitTimeout) + `,`,
+		`AutoAck:` + fmt.Sprintf("%v", this.AutoAck) + `,`,
+		`ReQueueChannel:` + fmt.Sprintf("%v", this.ReQueueChannel) + `,`,
+		`SequenceRange:` + fmt.Sprintf("%v", this.SequenceRange) + `,`,
+		`RefTransactionId:` + fmt.Sprintf("%v", this.RefTransactionId) + `,`,
+		`Metadata:` + mapStringForMetadata + `,`,
+		`XXX_unrecognized:` + fmt.Sprintf("%v", this.XXX_unrecognized) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *QueuesDownstreamResponse) String() string {
+	if this == nil {
+		return "nil"
+	}
+	keysForMetadata := make([]string, 0, len(this.Metadata))
+	for k, _ := range this.Metadata {
+		keysForMetadata = append(keysForMetadata, k)
+	}
+	github_com_gogo_protobuf_sortkeys.Strings(keysForMetadata)
+	mapStringForMetadata := "map[string]string{"
+	for _, k := range keysForMetadata {
+		mapStringForMetadata += fmt.Sprintf("%v: %v,", k, this.Metadata[k])
+	}
+	mapStringForMetadata += "}"
+	s := strings.Join([]string{`&QueuesDownstreamResponse{`,
 		`TransactionId:` + fmt.Sprintf("%v", this.TransactionId) + `,`,
 		`RefRequestId:` + fmt.Sprintf("%v", this.RefRequestId) + `,`,
-		`StreamRequestTypeData:` + fmt.Sprintf("%v", this.StreamRequestTypeData) + `,`,
+		`RequestTypeData:` + fmt.Sprintf("%v", this.RequestTypeData) + `,`,
 		`Messages:` + strings.Replace(fmt.Sprintf("%v", this.Messages), "QueueMessage", "QueueMessage", 1) + `,`,
 		`IsError:` + fmt.Sprintf("%v", this.IsError) + `,`,
 		`Error:` + fmt.Sprintf("%v", this.Error) + `,`,
-		`Headers:` + mapStringForHeaders + `,`,
+		`Metadata:` + mapStringForMetadata + `,`,
 		`XXX_unrecognized:` + fmt.Sprintf("%v", this.XXX_unrecognized) + `,`,
 		`}`,
 	}, "")
@@ -12224,7 +12828,7 @@ func (m *StreamQueueMessagesResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *PollRequest) Unmarshal(dAtA []byte) error {
+func (m *QueuesUpstreamRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -12247,10 +12851,302 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: PollRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueuesUpstreamRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PollRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueuesUpstreamRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RequestID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RequestID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Messages", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Messages = append(m.Messages, &QueueMessage{})
+			if err := m.Messages[len(m.Messages)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipKubemqGo(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueuesUpstreamResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowKubemqGo
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueuesUpstreamResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueuesUpstreamResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RefRequestID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RefRequestID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Results", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Results = append(m.Results, &SendQueueMessageResult{})
+			if err := m.Results[len(m.Results)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IsError", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.IsError = bool(v != 0)
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Error", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Error = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipKubemqGo(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueuesDownstreamRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowKubemqGo
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueuesDownstreamRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueuesDownstreamRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -12319,9 +13215,9 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StreamRequestTypeData", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RequestTypeData", wireType)
 			}
-			m.StreamRequestTypeData = 0
+			m.RequestTypeData = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowKubemqGo
@@ -12331,7 +13227,7 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.StreamRequestTypeData |= PollRequestType(b&0x7F) << shift
+				m.RequestTypeData |= QueuesDownstreamRequestType(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12370,6 +13266,44 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 5:
 			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxItems", wireType)
+			}
+			m.MaxItems = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MaxItems |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WaitTimeout", wireType)
+			}
+			m.WaitTimeout = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.WaitTimeout |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AutoAck", wireType)
 			}
 			var v int
@@ -12388,7 +13322,39 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.AutoAck = bool(v != 0)
-		case 6:
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ReQueueChannel", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowKubemqGo
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthKubemqGo
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ReQueueChannel = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
 			if wireType == 0 {
 				var v int64
 				for shift := uint(0); ; shift += 7 {
@@ -12405,7 +13371,7 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				m.AckRange = append(m.AckRange, v)
+				m.SequenceRange = append(m.SequenceRange, v)
 			} else if wireType == 2 {
 				var packedLen int
 				for shift := uint(0); ; shift += 7 {
@@ -12440,8 +13406,8 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 					}
 				}
 				elementCount = count
-				if elementCount != 0 && len(m.AckRange) == 0 {
-					m.AckRange = make([]int64, 0, elementCount)
+				if elementCount != 0 && len(m.SequenceRange) == 0 {
+					m.SequenceRange = make([]int64, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v int64
@@ -12459,12 +13425,12 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 							break
 						}
 					}
-					m.AckRange = append(m.AckRange, v)
+					m.SequenceRange = append(m.SequenceRange, v)
 				}
 			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field AckRange", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SequenceRange", wireType)
 			}
-		case 7:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RefTransactionId", wireType)
 			}
@@ -12496,9 +13462,9 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.RefTransactionId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 12:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Headers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -12525,8 +13491,8 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Headers == nil {
-				m.Headers = make(map[string]string)
+			if m.Metadata == nil {
+				m.Metadata = make(map[string]string)
 			}
 			var mapkey string
 			var mapvalue string
@@ -12621,7 +13587,7 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.Headers[mapkey] = mapvalue
+			m.Metadata[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -12648,7 +13614,7 @@ func (m *PollRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *PollResponse) Unmarshal(dAtA []byte) error {
+func (m *QueuesDownstreamResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -12671,10 +13637,10 @@ func (m *PollResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: PollResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueuesDownstreamResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PollResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueuesDownstreamResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -12743,9 +13709,9 @@ func (m *PollResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StreamRequestTypeData", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RequestTypeData", wireType)
 			}
-			m.StreamRequestTypeData = 0
+			m.RequestTypeData = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowKubemqGo
@@ -12755,7 +13721,7 @@ func (m *PollResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.StreamRequestTypeData |= PollRequestType(b&0x7F) << shift
+				m.RequestTypeData |= QueuesDownstreamRequestType(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -12848,7 +13814,7 @@ func (m *PollResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Headers", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -12875,8 +13841,8 @@ func (m *PollResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Headers == nil {
-				m.Headers = make(map[string]string)
+			if m.Metadata == nil {
+				m.Metadata = make(map[string]string)
 			}
 			var mapkey string
 			var mapvalue string
@@ -12971,7 +13937,7 @@ func (m *PollResponse) Unmarshal(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.Headers[mapkey] = mapvalue
+			m.Metadata[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
