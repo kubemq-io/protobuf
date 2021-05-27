@@ -29,6 +29,7 @@ service kubemq {
     rpc Ping (Empty) returns (PingResult) {}
     rpc QueuesDownstream(stream QueuesDownstreamRequest) returns (stream QueuesDownstreamResponse) {}
     rpc QueuesUpstream(stream QueuesUpstreamRequest) returns (stream QueuesUpstreamResponse) {}
+    rpc QueuesInfo(QueuesInfoRequest) returns (QueuesInfoResponse) {}
 }
 message PingResult {
     string  Host        =1;
@@ -124,14 +125,17 @@ message Response {
 }
 
 message QueueMessage {
-    string  MessageID        =1;
-    string  ClientID         =2;
-    string  Channel        =3;
-    string  Metadata         =4;
-    bytes   Body             =5;
-    map<string,string>  Tags             =6;
-    QueueMessageAttributes Attributes    =7;
-    QueueMessagePolicy Policy            =8;
+    string  MessageID                   =1;
+    string  ClientID                    =2;
+    string  Channel                     =3;
+    string  Metadata                    =4;
+    bytes   Body                        =5;
+    map<string,string>  Tags            =6;
+    QueueMessageAttributes Attributes   =7;
+    QueueMessagePolicy Policy           =8;
+    string Topic                        =9;
+    int32  Partition                    =10;
+    string PartitionKey                 =11;
 }
 message QueueMessagesBatchRequest {
     string      BatchID                 =1;
@@ -152,7 +156,6 @@ message QueueMessageAttributes {
     string              ReRoutedFromQueue           =6;
     int64               ExpirationAt                =7;
     int64               DelayedTo                   =8;
-
 }
 
 message QueueMessagePolicy {
@@ -169,6 +172,10 @@ message SendQueueMessageResult {
     int64   DelayedTo       =4;
     bool    IsError         =5;
     string  Error           =6;
+    string  RefChannel      =7;
+    string  RefTopic         =8;
+    int32   RefPartition     =9;
+    string  RefHash         =10;
 }
 
 message ReceiveQueueMessagesRequest {
@@ -202,6 +209,7 @@ message AckAllQueueMessagesResponse {
     bool    IsError                 =3;
     string  Error                   =4;
 }
+
 
 enum StreamRequestType {
     StreamRequestTypeUnknown      =0;
@@ -240,8 +248,8 @@ message QueuesUpstreamRequest {
 message QueuesUpstreamResponse {
     string      RefRequestID                    =1;
     repeated    SendQueueMessageResult Results  =2;
-    bool IsError                    =3;
-    string Error                    =4;
+    bool        IsError                    =3;
+    string      Error                    =4;
 }
 
 
@@ -284,4 +292,151 @@ message QueuesDownstreamResponse {
     string Error                    =7;
     bool TransactionComplete        =8;
     map<string,string>  Metadata     =9;
+}
+
+message QueueInfo {
+    string Name         =1;
+    int64 Messages      =2;
+    int64 Bytes         =3;
+    int64 FirstSequence =4;
+    int64 LastSequence  =5;
+    int64 Sent          =6;
+    int64 Delivered     =7;
+    int64 Waiting       =8;
+    int64 Subscribers   =9;
+}
+message QueuesInfo {
+    int32 TotalQueue     =1;
+    int64 Sent          =2;
+    int64 Delivered     =3;
+    int64 Waiting       =4;
+    repeated QueueInfo Queues =5;
+}
+message QueuesInfoRequest {
+    string RequestID  =1;
+    string QueueName  =2;
+}
+
+message QueuesInfoResponse {
+    string RefRequestID  =1;
+    QueuesInfo Info   =2;
+
+}
+
+enum TopicsUpstreamRequestType {
+    TopicsUpstreamRequestUnknown    =0;
+    FireAndForget                   =1;
+    SendAsync                       =2;
+    SendSync                        =3;
+}
+message TopicsUpstreamRequest {
+    string      RequestID                     =1;
+    TopicsUpstreamRequestType RequestTypeData =2;
+    string      ClientID                      =3;
+    repeated    QueueMessage Messages         =4;
+}
+message TopicsUpstreamResponse {
+    string      RefRequestID                    =1;
+    TopicsUpstreamRequestType RequestTypeData   =2;
+    map<string,SendTopicResults>  TopicResults  =3;
+    bool        IsError                         =4;
+    string      Error                           =5;
+}
+
+message SendPartitionResults {
+    repeated SendQueueMessageResult PartitionResults =1;
+}
+
+message SendTopicResults {
+    map<int32,SendPartitionResults> TopicResults =1;
+}
+
+message TopicRecordHeader {
+    string Key =1;
+    bytes Value=2;
+}
+
+message TopicRecord {
+    repeated TopicRecordHeader Headers =1;
+    string   Topic                     =2;
+    uint32   Partition                 =3;
+    uint64   Timestamp                 =4;
+    bytes    Key                       =5;
+    bytes    Value                     =6;
+}
+
+message TopicPartition {
+    string Topic        =1;
+    uint32 Partition    =2;
+}
+enum TopicsSubscriptionStrategyType {
+    SubscriptionStrategyTypeUndefined =0;
+    Range                  =1;
+    RoundRobin             =2;
+    Sticky                 =3;
+}
+enum TopicsSubscriptionOffsetType {
+    SubscriptionOffsetTypeUndefined    =0;
+    StartNewOnly                       =1;
+    StartFromFirst                     =2;
+    StartFromLast                      =3;
+    StartAtSequence                    =4;
+    StartAtTime                        =5;
+    StartAtTimeDelta                   =6;
+}
+enum TopicsSubscriptionRequestType {
+    SubscriptionRequestTypeUndefined                           =0;
+    SubscriptionRequestTypeJoin                                =1;
+    SubscriptionRequestTypeLeave                               =2;
+}
+message TopicsSubscriptionRequest {
+    TopicsSubscriptionRequestType   SubscriptionRequestType         =1;
+    repeated string                 Topics                          =2;
+    repeated TopicPartition         TopicPartitions                 =3;
+    string                          GroupID                         =4;
+    string                          MemberID                        =5;
+    bool                            IsStatic                        =6;
+    TopicsSubscriptionStrategyType  SubscriptionStrategyType        =7;
+    TopicsSubscriptionOffsetType    SubscriptionOffsetType          =8;
+}
+
+enum  TopicsSubscriptionEventType {
+    SubscriptionEventTypeUndefined                  =0;
+    SubscriptionEventTypeSubscribe                  =1;
+    SubscriptionEventTypeReSync                     =2;
+    SubscriptionEventTypeReSyncComplete             =3;
+    SubscriptionEventTypeHeartbeat                  =4;
+    SubscriptionEventTypeLeave                      =5;
+    SubscriptionEventTypeGroupState                      =6;
+
+}
+message TopicsSubscriptionEvent {
+    string SubscriptionID                               =1;
+    TopicsSubscriptionEventType  SubscriptionEventType  =2;
+    string GroupID =3;
+    string MemberID =4;
+
+    repeated TopicPartition Assigned                    =5;
+    int64   ReSyncAt                                    =6;
+    bool    IsError =15;
+    string  Error = 16;
+}
+
+message TopicsDownstreamRequest {
+    string RequestID                                  =1;
+    TopicsDownstreamRequestType DownstreamRequestType =2;
+    bytes Data                                        =3;
+}
+enum TopicsDownstreamRequestType {
+    DownstreamRequestTypeUndefined                      = 0;
+    DownstreamRequestTypeSubscriptionRequest             =1;
+    DownstreamRequestTypeSubscriptionEvent               =2;
+}
+message TopicsDownstreamResponse {
+    string TransactionID            =1;
+    string RefRequestID             =2;
+    bytes Data                      =3;
+
+    bool    IsError =15;
+    string  Error = 16;
 }
